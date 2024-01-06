@@ -1,0 +1,964 @@
+<!-- *ngIf="pagePermission.orderforcompany.value" -->
+<c-row
+  style="display: flex; align-items: center; justify-content: space-between"
+  *ngIf="pagePermissions.selectcompany.value"
+>
+  <c-col
+    style="
+      background-color: #ced4da45;
+      border: 1px solid rgb(202, 202, 202);
+      border-radius: 7px;
+      display: flex;
+      max-width: max-content;
+      justify-content: center;
+      align-items: center;
+      padding: 0px 0px 0px 20px;
+      margin-left: 14px;
+    "
+  >
+    <label style="font-weight: 700; margin-right: 10px">Select Company :</label>
+
+    <p-dropdown
+      #companyDropdown
+      autoWidth="false"
+      [style]="{ width: '252px' }"
+      [options]="companies"
+      [(ngModel)]="orderFor"
+      (onChange)="getDashboardDataFor($event)"
+      [filter]="true"
+      filterBy="companyname"
+      optionLabel="companyname"
+      optionValue="companyid"
+      [showClear]="true"
+      placeholder="View dashboard of"
+    ></p-dropdown>
+  </c-col>
+</c-row>
+
+<c-row *ngIf="pagePermissions.view.value">
+  <c-col>
+    <c-card style="padding: 10px; margin-top: 20px">
+      <c-row style="position: relative">
+        <c-col
+          style="
+            width: 100%;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+          ><h5>Sim Details Upload</h5></c-col
+        >
+        <c-col
+          style="
+            max-width: max-content;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+          "
+        >
+          <button
+            (click)="togglePurchaseModal()"
+            cButton
+            style="background-color: red; border-style: none"
+            class="custom-button"
+          >
+            Details
+          </button>
+        </c-col>
+      </c-row>
+
+      <div style="display: flex; justify-content: center">
+        <c-chart
+          class="chart-container"
+          [data]="data[0]"
+          [options]="options[0]"
+          [plugins]="plugins"
+          type="bar"
+        ></c-chart>
+      </div>
+    </c-card>
+  </c-col>
+  <c-col>
+    <c-card style="padding: 10px; margin-top: 20px">
+      <c-row style="position: relative">
+        <c-col
+          style="
+            width: 100%;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+          ><h5>Stocks</h5></c-col
+        >
+        <c-col
+          style="
+            max-width: max-content;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+          "
+        >
+          <button
+            (click)="toggleStockModal()"
+            cButton
+            style="background-color: red; border-style: none"
+            class="custom-button"
+          >
+            Details
+          </button>
+        </c-col>
+      </c-row>
+      <div style="display: flex; justify-content: center">
+        <c-chart
+          class="chart-container"
+          [data]="data[1]"
+          [options]="options[1]"
+          type="bar"
+        ></c-chart>
+      </div>
+    </c-card>
+  </c-col>
+</c-row>
+
+<c-row *ngIf="pagePermissions.view.value">
+  <c-col>
+    <c-card style="padding: 10px; margin-top: 20px">
+      <c-row style="position: relative">
+        <c-col
+          style="
+            width: 100%;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+          ><h5>Shipping</h5></c-col
+        >
+        <c-col
+          style="
+            max-width: max-content;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+          "
+        >
+          <button
+            (click)="toggleShippingModal()"
+            cButton
+            style="background-color: red; border-style: none"
+            class="custom-button"
+          >
+            Details
+          </button>
+        </c-col>
+      </c-row>
+
+      <div style="display: flex; justify-content: center">
+        <c-chart
+          class="chart-container"
+          [data]="data[2]"
+          [options]="options[2]"
+          [plugins]="plugins"
+          type="bar"
+        ></c-chart>
+      </div>
+    </c-card>
+  </c-col>
+  <c-col>
+    <c-card style="padding: 10px; margin-top: 20px">
+      <c-row style="position: relative">
+        <c-col
+          style="
+            width: 100%;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+          ><h5>PO Status</h5></c-col
+        >
+        <c-col
+          style="
+            max-width: max-content;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+          "
+        >
+          <button
+            (click)="togglePOStatusModal()"
+            cButton
+            style="background-color: red; border-style: none"
+            class="custom-button"
+          >
+            Details
+          </button>
+        </c-col>
+      </c-row>
+      <div style="display: flex; justify-content: center">
+        <c-chart
+          class="chart-container"
+          [data]="data[3]"
+          [options]="options[3]"
+          type="bar"
+        ></c-chart>
+      </div>
+    </c-card>
+  </c-col>
+</c-row>
+
+<c-row *ngIf="pagePermissions.view.value">
+  <c-col>
+    <c-card style="padding: 10px; margin-top: 20px">
+      <c-row style="position: relative">
+        <c-col
+          style="
+            width: 100%;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+          ><h5>CA Requests</h5></c-col
+        >
+        <c-col
+          style="
+            max-width: max-content;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+          "
+        >
+          <button
+            (click)="toggleCAModal()"
+            cButton
+            style="background-color: red; border-style: none"
+            class="custom-button"
+          >
+            Details
+          </button>
+        </c-col>
+      </c-row>
+
+      <div style="display: flex; justify-content: center">
+        <c-chart
+          class="chart-container"
+          [data]="data[4]"
+          [options]="options[4]"
+          [plugins]="plugins"
+          type="bar"
+        ></c-chart>
+      </div>
+    </c-card>
+  </c-col>
+  <c-col>
+    <c-card style="padding: 10px; margin-top: 20px">
+      <c-row style="position: relative">
+        <c-col
+          style="
+            width: 100%;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+          ><h5>Renewal Requests</h5></c-col
+        >
+        <c-col
+          style="
+            max-width: max-content;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+          "
+        >
+          <button
+            (click)="toggleRRModal()"
+            cButton
+            style="background-color: red; border-style: none"
+            class="custom-button"
+          >
+            Details
+          </button>
+        </c-col>
+      </c-row>
+      <div style="display: flex; justify-content: center">
+        <c-chart
+          class="chart-container"
+          [data]="data[5]"
+          [options]="options[5]"
+          type="bar"
+        ></c-chart>
+      </div>
+    </c-card>
+  </c-col>
+</c-row>
+
+<c-row *ngIf="pagePermissions.view.value">
+  <c-col>
+    <c-card style="padding: 10px; margin: 20px 0px">
+      <c-row style="position: relative">
+        <c-col
+          style="
+            width: 100%;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+          ><h5>Topup Requests</h5></c-col
+        >
+        <c-col
+          style="
+            max-width: max-content;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+          "
+        >
+          <button
+            (click)="toggleTopupModal()"
+            cButton
+            style="background-color: red; border-style: none"
+            class="custom-button"
+          >
+            Details
+          </button>
+        </c-col>
+      </c-row>
+      <div style="display: flex; justify-content: center">
+        <c-chart
+          class="chart-container"
+          [data]="data[6]"
+          [options]="options[6]"
+          type="bar"
+        ></c-chart>
+      </div>
+    </c-card>
+  </c-col>
+  <c-col>
+    <c-card style="padding: 10px; margin: 20px 0px">
+      <c-row style="position: relative">
+        <c-col
+          style="
+            width: 100%;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+          ><h5>Extend 1Yr Requests</h5></c-col
+        >
+        <c-col
+          style="
+            max-width: max-content;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+          "
+        >
+          <button
+            (click)="toggleextend1YrModal()"
+            cButton
+            style="background-color: red; border-style: none"
+            class="custom-button"
+          >
+            Details
+          </button>
+        </c-col>
+      </c-row>
+      <div style="display: flex; justify-content: center">
+        <c-chart
+          class="chart-container"
+          [data]="data[7]"
+          [options]="options[7]"
+          type="bar"
+        ></c-chart>
+      </div>
+    </c-card>
+  </c-col>
+</c-row>
+
+<c-modal
+  size="xl"
+  #Extend1YrModal
+  id="purchaseModal"
+  *ngIf="purchaseModalLoader"
+  [visible]="purchaseModal"
+  (visibleChange)="handlePurchaseModal($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>Sim Details Upload</h4>
+    <div>
+      <button
+        cButton
+        (click)="togglePurchaseModal()"
+        style="background-color: red; border-style: none; margin-right: 10px"
+        class="custom-button"
+      >
+        Close
+      </button>
+    </div>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="card" style="margin-bottom: 10px">
+      <p-tabMenu
+        #tabMenu
+        class="caTabs"
+        [scrollable]="true"
+        [model]="purchasetab"
+        [activeItem]="activeTab"
+        (activeItemChange)="tabChanged($event)"
+      ></p-tabMenu>
+    </div>
+    <c-card class="mb-4">
+      <ag-grid-angular
+        #CAGrid
+        style="height: 75vh"
+        class="ag-theme-alpine"
+        [rowData]="rowData"
+        [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+        [columnDefs]="purchasecolumnDefs"
+        [defaultColDef]="defaultColDef"
+        rowAnimation
+        enableCellTextSelection
+        [pagination]="true"
+        [paginationPageSize]="selectedRowSize"
+      >
+      </ag-grid-angular>
+      <div
+        class="card flex justify-content-center"
+        style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+      >
+        <p-dropdown
+          [(ngModel)]="selectedRowSize"
+          [style]="{ width: '100% ', 'max-height': '35px ' }"
+          [options]="[100, 200, 500, 1000]"
+        ></p-dropdown>
+      </div>
+    </c-card>
+  </c-modal-body>
+</c-modal>
+
+<c-modal
+  size="xl"
+  #Extend1YrModal
+  id="stockModal"
+  *ngIf="stockModalLoader"
+  [visible]="stockModal"
+  (visibleChange)="handleStocksModal($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>Stocks Details</h4>
+    <div>
+      <button
+        cButton
+        (click)="toggleStockModal()"
+        style="background-color: red; border-style: none; margin-right: 10px"
+        class="custom-button"
+      >
+        Close
+      </button>
+    </div>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="card" style="margin-bottom: 10px">
+      <p-tabMenu
+        #tabMenu
+        class="caTabs"
+        [scrollable]="true"
+        [model]="stocktab"
+        [activeItem]="activeTab"
+        (activeItemChange)="tabChanged($event)"
+      ></p-tabMenu>
+    </div>
+    <c-card class="mb-4">
+      <ag-grid-angular
+        #CAGrid
+        style="height: 75vh"
+        class="ag-theme-alpine"
+        [rowData]="rowData"
+        [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+        [columnDefs]="purchasecolumnDefs"
+        [defaultColDef]="defaultColDef"
+        rowAnimation
+        enableCellTextSelection
+        [pagination]="true"
+        [paginationPageSize]="selectedRowSize"
+      >
+      </ag-grid-angular>
+      <div
+        class="card flex justify-content-center"
+        style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+      >
+        <p-dropdown
+          [(ngModel)]="selectedRowSize"
+          [style]="{ width: '100% ', 'max-height': '35px ' }"
+          [options]="[100, 200, 500, 1000]"
+        ></p-dropdown>
+      </div>
+    </c-card>
+  </c-modal-body>
+</c-modal>
+
+<c-modal
+  size="xl"
+  #Extend1YrModal
+  id="shippingModal"
+  *ngIf="shippingModalLoader"
+  [visible]="shippingModal"
+  (visibleChange)="handleShippingModal($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>Shipping Details</h4>
+    <div>
+      <button
+        cButton
+        (click)="toggleShippingModal()"
+        style="background-color: red; border-style: none; margin-right: 10px"
+        class="custom-button"
+      >
+        Close
+      </button>
+    </div>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="card" style="margin-bottom: 10px">
+      <p-tabMenu
+        #tabMenu
+        class="caTabs"
+        [scrollable]="true"
+        [model]="shippingtab"
+        [activeItem]="activeTab"
+        (activeItemChange)="tabChanged($event)"
+      ></p-tabMenu>
+    </div>
+    <c-card class="mb-4">
+      <ag-grid-angular
+        #CAGrid
+        style="height: 75vh"
+        class="ag-theme-alpine"
+        [rowData]="rowData"
+        [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+        [columnDefs]="shippingColumnDefs"
+        [defaultColDef]="defaultColDef"
+        rowAnimation
+        enableCellTextSelection
+        [pagination]="true"
+        [paginationPageSize]="selectedRowSize"
+      >
+      </ag-grid-angular>
+      <div
+        class="card flex justify-content-center"
+        style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+      >
+        <p-dropdown
+          [(ngModel)]="selectedRowSize"
+          [style]="{ width: '100% ', 'max-height': '35px ' }"
+          [options]="[100, 200, 500, 1000]"
+        ></p-dropdown>
+      </div>
+    </c-card>
+  </c-modal-body>
+</c-modal>
+
+<c-modal
+  size="xl"
+  #Extend1YrModal
+  id="poModal"
+  *ngIf="poModalLoader"
+  [visible]="poModal"
+  (visibleChange)="handlePOStatusModal($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>Purchase Order Status</h4>
+    <div>
+      <button
+        cButton
+        (click)="togglePOStatusModal()"
+        style="background-color: red; border-style: none; margin-right: 10px"
+        class="custom-button"
+      >
+        Close
+      </button>
+    </div>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="card" style="margin-bottom: 10px">
+      <p-tabMenu
+        #tabMenu
+        class="caTabs"
+        [scrollable]="true"
+        [model]="potab"
+        [activeItem]="activeTab"
+        (activeItemChange)="tabChanged($event)"
+      ></p-tabMenu>
+    </div>
+    <c-card class="mb-4">
+      <ag-grid-angular
+        #CAGrid
+        style="height: 75vh"
+        class="ag-theme-alpine"
+        [rowData]="rowData"
+        [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+        [columnDefs]="poColumnDefs"
+        [defaultColDef]="defaultColDef"
+        rowAnimation
+        enableCellTextSelection
+        [pagination]="true"
+        [paginationPageSize]="selectedRowSize"
+      >
+      </ag-grid-angular>
+      <div
+        class="card flex justify-content-center"
+        style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+      >
+        <p-dropdown
+          [(ngModel)]="selectedRowSize"
+          [style]="{ width: '100% ', 'max-height': '35px ' }"
+          [options]="[100, 200, 500, 1000]"
+        ></p-dropdown>
+      </div>
+    </c-card>
+  </c-modal-body>
+</c-modal>
+
+<c-modal
+  size="xl"
+  #Extend1YrModal
+  id="caModal"
+  *ngIf="caModalLoader"
+  [visible]="caModal"
+  (visibleChange)="handleCAModal($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>CA Requests</h4>
+    <div>
+      <button
+        cButton
+        (click)="toggleCAModal()"
+        style="background-color: red; border-style: none; margin-right: 10px"
+        class="custom-button"
+      >
+        Close
+      </button>
+      <button
+        cButton
+        (click)="redirectTo('/esim-ca-request')"
+        style="background-color: red; border-style: none"
+        class="custom-button"
+      >
+        Go to CA Requests Page
+      </button>
+    </div>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="card" style="margin-bottom: 10px">
+      <p-tabMenu
+        #tabMenu
+        class="caTabs"
+        [scrollable]="true"
+        [model]="tabs"
+        [activeItem]="activeTab"
+        (activeItemChange)="tabChanged($event)"
+      ></p-tabMenu>
+    </div>
+    <c-card class="mb-4">
+      <ag-grid-angular
+        #CAGrid
+        style="height: 75vh"
+        class="ag-theme-alpine"
+        [rowData]="rowData"
+        [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+        [columnDefs]="caColumnDefs"
+        [defaultColDef]="defaultColDef"
+        rowAnimation
+        enableCellTextSelection
+        [pagination]="true"
+        [paginationPageSize]="selectedRowSize"
+      >
+      </ag-grid-angular>
+      <div
+        class="card flex justify-content-center"
+        style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+      >
+        <p-dropdown
+          [(ngModel)]="selectedRowSize"
+          [style]="{ width: '100% ', 'max-height': '35px ' }"
+          [options]="[100, 200, 500, 1000]"
+        ></p-dropdown>
+      </div>
+    </c-card>
+  </c-modal-body>
+</c-modal>
+
+<c-modal
+  size="xl"
+  #RRModal
+  id="rrModal"
+  *ngIf="rrModalLoader"
+  [visible]="rrModal"
+  (visibleChange)="handleRRModal($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>Renewal Requests</h4>
+    <div>
+      <button
+        cButton
+        (click)="toggleRRModal()"
+        style="background-color: red; border-style: none; margin-right: 10px"
+        class="custom-button"
+      >
+        Close
+      </button>
+      <button
+        cButton
+        (click)="redirectTo('/esim-renewal-request')"
+        style="background-color: red; border-style: none"
+        class="custom-button"
+      >
+        Go to Renewal Requests Page
+      </button>
+    </div>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="card" style="margin-bottom: 10px">
+      <p-tabMenu
+        #tabMenu
+        class="caTabs"
+        [scrollable]="true"
+        [model]="tabs"
+        [activeItem]="activeTab"
+        (activeItemChange)="tabChanged($event)"
+      ></p-tabMenu>
+    </div>
+    <c-row>
+      <c-col
+        style="
+          background-color: #ced4da45;
+          border: 1px solid rgb(202, 202, 202);
+          border-radius: 7px;
+          display: flex;
+          max-width: max-content;
+          justify-content: center;
+          align-items: center;
+          margin-left: 10px;
+          padding: 0px 0px 0px 20px;
+        "
+      >
+        <label style="font-weight: 700; margin-right: 10px">
+          Renewal Stage
+        </label>
+
+        <p-dropdown
+          autoWidth="false"
+          [style]="{ width: '230px' }"
+          [options]="renewalno"
+          optionLabel="renewalNo"
+          optionValue="renewalId"
+          [filter]="true"
+          (onChange)="filterGridByRenewal($event)"
+        ></p-dropdown>
+      </c-col>
+    </c-row>
+
+    <c-card class="mb-4" style="margin-top: 10px">
+      <ag-grid-angular
+        #CAGrid
+        style="height: 75vh"
+        class="ag-theme-alpine"
+        [rowData]="rowData"
+        [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+        [columnDefs]="rrColumnDefs"
+        [defaultColDef]="defaultColDef"
+        rowAnimation
+        enableCellTextSelection
+        [pagination]="true"
+        [paginationPageSize]="selectedRowSize"
+      >
+      </ag-grid-angular>
+      <div
+        class="card flex justify-content-center"
+        style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+      >
+        <p-dropdown
+          [(ngModel)]="selectedRowSize"
+          [style]="{ width: '100% ', 'max-height': '35px ' }"
+          [options]="[100, 200, 500, 1000]"
+        ></p-dropdown>
+      </div>
+    </c-card>
+  </c-modal-body>
+</c-modal>
+
+<c-modal
+  size="xl"
+  #TopupModal
+  id="topupModal"
+  *ngIf="topupModalLoader"
+  [visible]="topupModal"
+  (visibleChange)="handleTopupModal($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>Topup Requests</h4>
+    <div>
+      <button
+        cButton
+        (click)="toggleTopupModal()"
+        style="background-color: red; border-style: none; margin-right: 10px"
+        class="custom-button"
+      >
+        Close
+      </button>
+      <button
+        cButton
+        (click)="redirectTo('/esim-topup-request')"
+        style="background-color: red; border-style: none"
+        class="custom-button"
+      >
+        Go to Topup Requests Page
+      </button>
+    </div>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="card" style="margin-bottom: 10px">
+      <p-tabMenu
+        #tabMenu
+        class="caTabs"
+        [scrollable]="true"
+        [model]="tabs"
+        [activeItem]="activeTab"
+        (activeItemChange)="tabChanged($event)"
+      ></p-tabMenu>
+    </div>
+    <c-card class="mb-4">
+      <ag-grid-angular
+        #CAGrid
+        style="height: 75vh"
+        class="ag-theme-alpine"
+        [rowData]="rowData"
+        [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+        [columnDefs]="topupColumnDefs"
+        [defaultColDef]="defaultColDef"
+        rowAnimation
+        enableCellTextSelection
+        [pagination]="true"
+        [paginationPageSize]="selectedRowSize"
+      >
+      </ag-grid-angular>
+      <div
+        class="card flex justify-content-center"
+        style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+      >
+        <p-dropdown
+          [(ngModel)]="selectedRowSize"
+          [style]="{ width: '100% ', 'max-height': '35px ' }"
+          [options]="[100, 200, 500, 1000]"
+        ></p-dropdown>
+      </div>
+    </c-card>
+  </c-modal-body>
+</c-modal>
+
+<c-modal
+  size="xl"
+  #Extend1YrModal
+  id="extend1YrModal"
+  *ngIf="extend1YrModalLoader"
+  [visible]="extend1YrModal"
+  (visibleChange)="handleextend1YrModal($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>Extend 1 Year Requests</h4>
+    <div>
+      <button
+        cButton
+        (click)="toggleextend1YrModal()"
+        style="background-color: red; border-style: none; margin-right: 10px"
+        class="custom-button"
+      >
+        Close
+      </button>
+      <button
+        cButton
+        (click)="redirectTo('/esim-extend-validity-request')"
+        style="background-color: red; border-style: none"
+        class="custom-button"
+      >
+        Go to Extend 1 Year Requests Page
+      </button>
+    </div>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="card" style="margin-bottom: 10px">
+      <p-tabMenu
+        #tabMenu
+        class="caTabs"
+        [scrollable]="true"
+        [model]="tabs"
+        [activeItem]="activeTab"
+        (activeItemChange)="tabChanged($event)"
+      ></p-tabMenu>
+    </div>
+    <c-card class="mb-4">
+      <ag-grid-angular
+        #CAGrid
+        style="height: 75vh"
+        class="ag-theme-alpine"
+        [rowData]="rowData"
+        [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+        [columnDefs]="extendColumnDefs"
+        [defaultColDef]="defaultColDef"
+        rowAnimation
+        enableCellTextSelection
+        [pagination]="true"
+        [paginationPageSize]="selectedRowSize"
+      >
+      </ag-grid-angular>
+      <div
+        class="card flex justify-content-center"
+        style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+      >
+        <p-dropdown
+          [(ngModel)]="selectedRowSize"
+          [style]="{ width: '100% ', 'max-height': '35px ' }"
+          [options]="[100, 200, 500, 1000]"
+        ></p-dropdown>
+      </div>
+    </c-card>
+  </c-modal-body>
+</c-modal>

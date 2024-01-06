@@ -1,0 +1,36 @@
+.example-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.example-full-width {
+  width: 100%;
+}
+
+.keyValueList li {
+  width: 50%;
+}
+
+.input-Container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .input-Container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .input-Container div {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+:host ::ng-deep .p-dropdown {
+  height: 5.5vh;
+}

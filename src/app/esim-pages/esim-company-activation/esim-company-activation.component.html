@@ -1,0 +1,148 @@
+<p-toast key="toast1"></p-toast>
+<c-card *ngIf="pagePermission?.view?.value == true" class="mb-4">
+  <ag-grid-angular
+    #myGrid
+    [pagination]="true"
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowData]="rowData"
+    [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    rowAnimation
+    (gridReady)="onGridReady()"
+    enableCellTextSelection
+    [paginationPageSize]="selectedRowSize"
+  >
+  </ag-grid-angular>
+  <div
+    class="card flex justify-content-center"
+    style="position: absolute; bottom: 0px; margin: 0 0 6px 5px"
+  >
+    <p-dropdown
+      [style]="{ width: '100%', 'max-height': '35px' }"
+      [(ngModel)]="selectedRowSize"
+      [options]="[100, 200, 500, 1000]"
+    ></p-dropdown>
+  </div>
+</c-card>
+
+<c-modal
+  [visible]="detailsModal"
+  #verticallyCenteredModal
+  alignment="center"
+  id="verticallyCenteredModal"
+  (visibleChange)="handleDetailsModalChange($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Request Details</h5>
+    <button (click)="toggleLiveDemo()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Company Name</li>
+      <li cListGroupItem [color]="'warning'">{{ details.companyname }}</li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Company Display Name</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ details.companydisplayname }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">First Name</li>
+      <li cListGroupItem [color]="'warning'">{{ details.firstname }}</li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Last Name</li>
+      <li cListGroupItem [color]="'warning'">{{ details.lastname }}</li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Primary email ID</li>
+      <li cListGroupItem [color]="'warning'">{{ details.primaryemail }}</li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Primary contact no</li>
+      <li cListGroupItem [color]="'warning'">{{ details.primarycontactno }}</li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Country</li>
+      <li cListGroupItem [color]="'warning'">{{ details.country }}</li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">State</li>
+      <li cListGroupItem [color]="'warning'">{{ details.state }}</li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">City</li>
+      <li cListGroupItem [color]="'warning'">{{ details.district }}</li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Address</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ details.address }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">ID type</li>
+      <li cListGroupItem [color]="'warning'">{{ details.idtype }}</li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">ID no</li>
+      <li cListGroupItem [color]="'warning'">{{ details.idno }}</li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Secondary email ID</li>
+      <li cListGroupItem [color]="'warning'">{{ details.secondaryemail }}</li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Secondary contact no</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ details.secondarycontactno }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Request Date</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ details.createddate }}
+      </li>
+    </ul>
+  </c-modal-body>
+</c-modal>
+
+<c-modal
+  id="activateModal"
+  #activateModal
+  alignment="center"
+  [visible]="activateModalToggle"
+  (visibleChange)="handleActivateModalChange($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Select a role for the customer</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <label for="address">Roll Name</label>
+    <p-dropdown
+      autoWidth="false"
+      [style]="{ width: '100%' }"
+      [options]="role"
+      optionValue="roleid"
+      optionLabel="rolename"
+      [filter]="true"
+      filterBy="name"
+      [(ngModel)]="selectedRole"
+      [showClear]="true"
+      placeholder="Select the role name "
+    ></p-dropdown>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="primary" (click)="activateUser()">Activate</button>
+    <button (click)="toggleActivateModal($event)" cButton color="secondary">
+      Close
+    </button>
+  </c-modal-footer>
+</c-modal>

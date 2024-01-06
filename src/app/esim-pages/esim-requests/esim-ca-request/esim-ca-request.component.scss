@@ -1,0 +1,40 @@
+.custom-button {
+  font-weight: 500;
+  width: 100%;
+  background: linear-gradient(132deg, rgba(29, 78, 216, 0.89), #e74655);
+  border: none;
+  color: white;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+  cursor: pointer;
+}
+
+.custom-button:hover {
+  background: linear-gradient(132deg, #194ee0f7, #d32b2b);
+  box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.3);
+}
+
+.dealer-label {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px;
+}
+
+.date-input {
+  display: block;
+  max-width: max-content;
+  margin-right: 45%;
+  padding: 0.375rem 0.75rem;
+  cursor: not-allowed;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--cui-input-color, rgba(44, 56, 74, 0.95));
+  background-color: var(--cui-input-bg, #fff);
+  background-clip: padding-box;
+  border: 1px solid var(--cui-input-border-color, #b1b7c1);
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0.375rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}

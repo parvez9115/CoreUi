@@ -1,0 +1,204 @@
+<p-toast key="toast1"></p-toast>
+<button cButton class="floatingButton" title="Export" (click)="export()">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 2px"
+  ></i>
+</button>
+<div class="card" style="margin-bottom: 10px">
+  <p-tabMenu
+    #tabMenu
+    class="caTabs"
+    [scrollable]="true"
+    [model]="tabs"
+    [activeItem]="activeTab"
+    (activeItemChange)="tabChanged($event)"
+  ></p-tabMenu>
+</div>
+
+<!--    -->
+<c-col
+  style="display: flex; justify-content: flex-end; margin: 10px"
+  *ngIf="pagePermissions?.extendvalidity?.value"
+>
+  <button
+    cButton
+    #extend
+    style="background-color: red; border-style: none"
+    class="custom-button"
+    (click)="toggleExtendValidityModal()"
+  >
+    Extend 1 Year
+  </button>
+</c-col>
+
+<c-card class="mb-4">
+  <div style="display: flex; justify-content: flex-end">
+    <span class="p-input-icon-left" style="width: 40%; margin: 5px">
+      <i class="pi pi-search"></i>
+      <input
+        type="text"
+        pInputText
+        (change)="gridPagination.checkSearch($event)"
+        (keyup.enter)="handlePagination('first')"
+        [(ngModel)]="gridPagination.searchTerm"
+        style="width: 100%"
+        placeholder="Search grid"
+      />
+      <i
+        class="pi pi-times"
+        style="right: 4%;cursor: pointer;"
+        (click)="
+          gridPagination.searchTerm = '';
+          gridPagination.isSearched?handlePagination('first'):null;
+          gridPagination.isSearched=false;
+        "
+      ></i>
+    </span>
+    <button
+      style="margin: 5px"
+      type="submit"
+      class="btn btn-primary"
+      (click)="handlePagination('first')"
+      [disabled]="
+        gridPagination.searchTerm == undefined ||
+        gridPagination.searchTerm == ''
+      "
+    >
+      Search
+    </button>
+  </div>
+  <ag-grid-angular
+    #EEVGrid
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowSelection]="'multiple'"
+    [rowData]="rowData"
+    [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+    [rowMultiSelectWithClick]="true"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    (gridReady)="onGridReady($event)"
+    (rowSelected)="clearToast()"
+    rowAnimation
+    enableCellTextSelection
+  >
+  </ag-grid-angular>
+  <div class="paginationContainer">
+    <span class="paginationText">{{
+      gridPagination.totalRecords!=0? gridPagination.currentPage * 100 + 1:0
+    }}</span>
+    to <span class="paginationText">{{ gridPagination.toRecord }}</span> of
+    <span class="paginationText">{{ gridPagination.totalRecords }}</span>
+    <div style="display: flex; align-items: center">
+      <i
+        class="pi pi-fast-backward paginationIcon"
+        (click)="handlePagination('first')"
+      ></i>
+      <i
+        class="pi pi-caret-left paginationIcon"
+        (click)="handlePagination('previous')"
+      ></i>
+      Page
+      <span class="paginationText">{{ gridPagination.currentPage + 1 }}</span>
+      of {{ gridPagination.totalPages + 1 }}
+      <i
+        class="pi pi-caret-right paginationIcon"
+        (click)="handlePagination('next')"
+      ></i>
+      <i
+        class="pi pi-fast-forward paginationIcon"
+        (click)="handlePagination('last')"
+      ></i>
+    </div>
+  </div>
+</c-card>
+
+<c-modal
+  id="extendValdityModal"
+  #activationModal
+  alignment="center"
+  size="lg"
+  *ngIf="extendValidityModalLoader"
+  [visible]="extendValidityModalToggle"
+  (visibleChange)="handleExtendValidityModalChange($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Extend Validity</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <ag-grid-angular
+      #selectedRowsGrid
+      style="height: 300px"
+      class="ag-theme-alpine"
+      [rowData]="selectedRows"
+      [columnDefs]="selectedRowColumnDefs"
+      [defaultColDef]="defaultColDef"
+    >
+    </ag-grid-angular>
+    <form [formGroup]="extendValidityForm">
+      <c-row>
+        <c-col>
+          <label
+            style="margin-bottom: 5px; margin-top: 10px; font-weight: bold"
+            for="companydisplayname"
+          >
+            Comment :</label
+          >
+          <input
+            cFormControl
+            formControlName="comment"
+            type="text"
+            class="form-control"
+            id="companydisplayname"
+            placeholder="Enter comments if any"
+          />
+        </c-col>
+      </c-row>
+      <!-- <c-row style="justify-content: center"> -->
+      <!-- <c-col md="11" style="margin-bottom: 10px">
+          <label for="address" style="padding-bottom: 5px"
+            >Extend Validity</label
+          >
+          <p-dropdown
+            autoWidth="false"
+            [style]="{ width: '100%' }"
+            [options]="plans"
+            optionValue="planValue"
+            optionLabel="years"
+            formControlName="extendValidityPlan"
+            [showClear]="true"
+            placeholder="Select a Plan"
+          ></p-dropdown>
+        </c-col> -->
+      <!--      
+        <c-col md="12" class="px-4" style="margin-top: 10px">
+          <label style="padding: 0px 12px; width: 50%"
+            >Choose Extension Date:
+          </label>
+          <p-calendar
+            formControlName="extendValidityActivationDate"
+            [showIcon]="true"
+            [style]="{ width: '48%', height: '40px' }"
+          ></p-calendar>
+        </c-col> -->
+    </form>
+  </c-modal-body>
+  <c-modal-footer>
+    <button
+      cButton
+      color="primary"
+      (click)="extendValidityActivation()"
+      disabled="{{ extendValidityForm.invalid }}"
+    >
+      Extend Valdity
+    </button>
+    <button (click)="toggleExtendValidityModal()" cButton color="secondary">
+      Close
+    </button>
+  </c-modal-footer>
+</c-modal>

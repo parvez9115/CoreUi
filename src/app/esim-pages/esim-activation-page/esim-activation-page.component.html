@@ -1,0 +1,511 @@
+<button cButton class="floatingButton" title="Export" (click)="export()">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 2px"
+  ></i>
+</button>
+<!-- <button
+  cButton
+  class="floatingButton"
+  title="Import"
+  (click)="downloadExcel()"
+  style="top: 73vh; background-color: rgb(211, 211, 0)"
+>
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 2px"
+  ></i>
+</button> -->
+<!-- <div [visible]="visible" cCollapse>
+  <p-toast key="toast1"></p-toast>
+  <c-card class="mt-3 shadow">
+    <c-card-body>
+      <div *ngIf="isEdit == true || pagePermissions?.add?.value == true">
+        <form [formGroup]="savesimForm">
+          <c-row class="align-items-start" style="height: 55px">
+            <c-col sm="6">
+              <c-input-group class="mb-3" sizing="sm">
+                <span cInputGroupText id="basic-addon1">Primary ICCID No</span>
+                <input
+                  aria-describedby="basic-addon1"
+                  aria-label="Username"
+                  formControlName="primaryiccid"
+                  cFormControl
+                  placeholder="Enter the primary ICCID no"
+                />
+              </c-input-group>
+            </c-col>
+            <c-col sm="6" *ngIf="savesimForm.controls['activateon'] as ctrl">
+              <c-input-group sizing="sm">
+                <span cInputGroupText id="basic-addon1">Activate On</span>
+                <input
+                  aria-describedby="basic-addon1"
+                  aria-label="Username"
+                  cFormControl
+                  (change)="dateValidation('activate')"
+                  formControlName="activateon"
+                  placeholder="Enter the Activate on"
+                  type="date"
+                  [valid]="
+                    ctrl.touched && ctrl.valid
+                      ? true
+                      : ctrl.touched && ctrl.invalid
+                      ? false
+                      : undefined
+                  "
+                />
+              </c-input-group>
+              <c-form-feedback
+                *ngIf="ctrl.invalid"
+                style="display: block; font-size: 12px"
+              >
+                <ng-container *ngIf="ctrl.errors as errors">
+                  <div *ngIf="errors['invalidDate']">
+                    Date of activation must be earlier than the date of expiry
+                  </div>
+                  <div *ngIf="errors['invalidYear']">Enter a valid year</div>
+                </ng-container>
+              </c-form-feedback>
+            </c-col>
+          </c-row>
+          <c-row class="align-items-start">
+            <c-col sm="6" *ngIf="savesimForm.controls['expiredon'] as ctrl">
+              <c-input-group sizing="sm">
+                <span cInputGroupText id="basic-addon1">Expire On</span>
+                <input
+                  aria-describedby="basic-addon1"
+                  aria-label="Username"
+                  cFormControl
+                  (change)="dateValidation('expire')"
+                  type="date"
+                  formControlName="expiredon"
+                  placeholder="Enter the Expire on"
+                  [valid]="
+                    ctrl.touched && ctrl.valid
+                      ? true
+                      : ctrl.touched && ctrl.invalid
+                      ? false
+                      : undefined
+                  "
+                />
+              </c-input-group>
+              <c-form-feedback
+                *ngIf="ctrl.invalid"
+                style="display: block; font-size: 12px"
+              >
+                <ng-container *ngIf="ctrl.errors as errors">
+                  <div *ngIf="errors['invalidDate']">
+                    Date of expiration must be later than the date of activation
+                  </div>
+                  <div *ngIf="errors['invalidYear']">Enter a valid year</div>
+                </ng-container>
+              </c-form-feedback>
+            </c-col>
+            <c-col sm="6">
+              <c-input-group class="mb-3" sizing="sm">
+                <input
+                  cFormControl
+                  #fileUpload
+                  (change)="onFileChange($event)"
+                  formControlName="fileupload"
+                  id="inputGroupFile01"
+                  type="file"
+                />
+              </c-input-group>
+            </c-col>
+          </c-row>
+        </form>
+        <c-col style="display: flex; justify-content: center">
+          <button
+            style="margin-right: 10px; justify-self: flex-end"
+            size="sm"
+            cButton
+            color="primary"
+            (click)="isEdit ? edit() : upload()"
+            [disabled]="!savesimForm.valid"
+            variant="outline"
+          >
+            {{ isEdit ? "Edit" : "Submit" }}
+          </button>
+          <button
+            size="sm"
+            style="margin-left: 10px"
+            cButton
+            (click)="clear()"
+            color="dark"
+            variant="outline"
+          >
+            Clear
+          </button>
+        </c-col>
+      </div>
+      <div *ngIf="pagePermissions?.viewiccid?.value">
+        <c-row
+          class="align-items-start"
+          style="
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+          "
+        >
+          <c-col style="display: flex; justify-content: center">
+            <c-col sm="8">
+              <c-input-group class="mb-3" style="width: 100%" sizing="sm">
+                <span cInputGroupText id="basic-addon1"
+                  >Check In Primary ICCID No
+                </span>
+                <input
+                  aria-describedby="basic-addon1"
+                  aria-label="Username"
+                  cFormControl
+                  [(ngModel)]="iccidFinder"
+                  placeholder="Enter the primary ICCID no"
+                />
+              </c-input-group>
+            </c-col>
+          </c-col>
+          <c-col style="display: flex; justify-content: center">
+            <button
+              size="sm"
+              style="margin-right: 10px"
+              cButton
+              color="success"
+              variant="outline"
+              (click)="search()"
+            >
+              Show
+            </button>
+            <button
+              size="sm"
+              style="margin-left: 10px"
+              cButton
+              (click)="clearIccid()"
+              color="dark"
+              variant="outline"
+            >
+              Clear
+            </button>
+          </c-col>
+        </c-row>
+      </div>
+    </c-card-body>
+  </c-card>
+</div>
+<c-row style="justify-content: end; margin: 10px 0px">
+  <button
+    (click)="toggleCollapse()"
+    size="sm"
+    cButton
+    color="primary"
+    *ngIf="
+      !(
+        pagePermissions?.add?.value == false &&
+        pagePermissions?.edit?.value == false &&
+        pagePermissions?.viewiccid?.value == false
+      )
+    "
+  >
+    <svg cIcon name="{{ visible ? 'cilArrowTop' : 'cilArrowBottom' }}"></svg>
+    {{ visible ? "Close" : "Open" }}
+  </button>
+</c-row> -->
+<c-card
+  *ngIf="pagePermissions?.viewiccid?.value"
+  style="border-left: 5px solid rgb(39, 90, 228)"
+>
+  <c-card-body>
+    <c-row style="margin-top: 1%">
+      <c-col md="6" style="margin-left: 14%; margin-right: 3%">
+        <c-input-group class="mb-3" style="width: 100%" sizing="md">
+          <span cInputGroupText id="basic-addon1">Check Primary ICCID No </span>
+          <input
+            aria-describedby="basic-addon1"
+            aria-label="Username"
+            cFormControl
+            [(ngModel)]="iccidFinder"
+            placeholder="Enter the primary ICCID no"
+          />
+        </c-input-group>
+      </c-col>
+
+      <c-col md="2">
+        <div class="d-flex justify-content-center">
+          <button type="submit" class="btn btn-primary" (click)="search()">
+            Show
+          </button>
+          <div style="width: 10px"></div>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="clearIccid()"
+          >
+            Clear
+          </button>
+        </div>
+
+        <!-- <button
+          size="sm"
+          style="margin-left: 5%"
+          cButton
+          color="success"
+          variant="outline"
+          (click)="search()"
+        >
+          Show
+        </button>
+
+        <button
+          size="sm"
+          style="margin-left: 10px"
+          cButton
+          (click)="clearIccid()"
+          color="dark"
+          variant="outline"
+        >
+          Clear
+        </button> -->
+      </c-col>
+    </c-row>
+  </c-card-body>
+</c-card>
+
+<c-card
+  style="margin-top: 1.5%"
+  *ngIf="pagePermissions?.view?.value"
+  class="mb-4"
+>
+<div style="display: flex; justify-content: flex-end">
+  <span class="p-input-icon-left" style="width: 40%; margin: 5px">
+    <i class="pi pi-search"></i>
+    <input
+      type="text"
+      pInputText
+      (change)="gridPagination.checkSearch($event)"
+      (keyup.enter)="handlePagination('first')"
+      [(ngModel)]="gridPagination.searchTerm"
+      style="width: 100%"
+      placeholder="Search grid"
+    />
+    <i
+      class="pi pi-times"
+      style="right: 4%;cursor: pointer;"
+      (click)="
+         gridPagination.searchTerm = '';
+          gridPagination.isSearched?handlePagination('first'):null;
+          gridPagination.isSearched=false;;
+      "
+    ></i>
+  </span>
+  <button
+    style="margin: 5px"
+    type="submit"
+    class="btn btn-primary"
+    (click)="handlePagination('first')"
+    [disabled]="
+      gridPagination.searchTerm == undefined ||
+      gridPagination.searchTerm == ''
+    "
+  >
+    Search
+  </button>
+</div>
+  <ag-grid-angular
+    #myGrid
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowData]="rowData"
+    [alwaysShowVerticalScroll]="true"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    (gridReady)="onGridReady($event)"
+    rowAnimation
+    enableCellTextSelection
+  >
+  </ag-grid-angular>
+  <div class="paginationContainer">
+    <span class="paginationText">{{
+      gridPagination.totalRecords!=0? gridPagination.currentPage * 100 + 1:0
+    }}</span>
+    to <span class="paginationText">{{ gridPagination.toRecord }}</span> of
+    <span class="paginationText">{{ gridPagination.totalRecords }}</span>
+    <div style="display: flex; align-items: center">
+      <i
+        class="pi pi-fast-backward paginationIcon"
+        (click)="handlePagination('first')"
+      ></i>
+      <i
+        class="pi pi-caret-left paginationIcon"
+        (click)="handlePagination('previous')"
+      ></i>
+      Page
+      <span class="paginationText">{{ gridPagination.currentPage + 1 }}</span>
+      of {{ gridPagination.totalPages + 1 }}
+      <i
+        class="pi pi-caret-right paginationIcon"
+        (click)="handlePagination('next')"
+      ></i>
+      <i
+        class="pi pi-fast-forward paginationIcon"
+        (click)="handlePagination('last')"
+      ></i>
+    </div>
+  </div>
+</c-card>
+
+<c-modal
+  [visible]="liveDemoVisible"
+  #verticallyCenteredModal
+  alignment="center"
+  id="verticallyCenteredModal"
+  (visibleChange)="handleLiveDemoChange($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>ICCID Details</h5>
+    <button (click)="toggleLiveDemo()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem style="background-color: #d8dbe0; font-weight: 500">
+        ICCID No
+      </li>
+      <li cListGroupItem>
+        {{ value?.resultObj[0].iccid }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem style="background-color: #d8dbe0; font-weight: 500">
+        Card State
+      </li>
+      <li cListGroupItem>
+        {{ value?.resultObj[0].cardState }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem style="background-color: #d8dbe0; font-weight: 500">
+        Card Status
+      </li>
+      <li cListGroupItem>
+        {{ value?.resultObj[0].cardStatus }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem style="background-color: #d8dbe0; font-weight: 500">
+        Activate On
+      </li>
+      <li cListGroupItem>
+        {{ value?.resultObj[0].activateOn }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem style="background-color: #d8dbe0; font-weight: 500">
+        Expired On
+      </li>
+      <li cListGroupItem>
+        {{ value?.resultObj[0].expiredOn }}
+      </li>
+    </ul>
+
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem style="background-color: #d8dbe0; font-weight: 500">
+        Primary TSP
+      </li>
+      <li cListGroupItem>
+        {{ value?.resultObj[0].primaryTSP }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem style="background-color: #d8dbe0; font-weight: 500">
+        Primary MSISN
+      </li>
+      <li cListGroupItem>
+        {{ value?.resultObj[0].primaryMSISDN }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem style="background-color: #d8dbe0; font-weight: 500">
+        Primary Status
+      </li>
+      <li cListGroupItem>
+        {{ value?.resultObj[0].primaryStatus }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem style="background-color: #d8dbe0; font-weight: 500">
+        Fallback TSP
+      </li>
+      <li cListGroupItem>
+        {{ value?.resultObj[0].fallbackTSP }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem style="background-color: #d8dbe0; font-weight: 500">
+        Fallback MSISDN
+      </li>
+      <li cListGroupItem>
+        {{ value?.resultObj[0].fallbackMSISDN }}
+      </li>
+    </ul>
+
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem style="background-color: #d8dbe0; font-weight: 500">
+        Fallback Status
+      </li>
+      <li cListGroupItem>
+        {{ value?.resultObj[0].fallbackStatus }}
+      </li>
+    </ul>
+  </c-modal-body>
+</c-modal>
+
+<c-modal
+  size="xl"
+  #liveDemoModal
+  id="liveDemoModal"
+  [visible]="historyVisible"
+  (visibleChange)="handleHistoryModal($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>History</h4>
+    <p-button
+      (click)="historyVisible = false"
+      label="Close"
+      styleClass="p-button-raised p-button-text"
+    ></p-button>
+  </c-modal-header>
+  <c-modal-body>
+    <c-card class="mb-4">
+      <div *ngIf="rowDataHistory.length != 0; else noData">
+        <ag-grid-angular
+          #myGrid
+          style="height: 75vh"
+          class="ag-theme-alpine"
+          [rowData]="rowDataHistory"
+          [columnDefs]="columnDefsHistory"
+          [defaultColDef]="defaultColDef"
+          rowAnimation
+          enableCellTextSelection
+          [pagination]="true"
+          [paginationPageSize]="selectedRowSize"
+        >
+        </ag-grid-angular>
+        <div
+          class="card flex justify-content-center"
+          style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+        >
+          <p-dropdown
+            [(ngModel)]="selectedRowSize"
+            [style]="{ width: '100% ', 'max-height': '35px ' }"
+            [options]="[100, 200, 500, 1000]"
+          ></p-dropdown>
+        </div>
+      </div>
+      <ng-template #noData>
+        <h4 style="padding: 10px 20px; text-align: center; margin: 0px">
+          There's No history for this ICCID no: {{ iccid }}
+        </h4>
+      </ng-template>
+    </c-card>
+  </c-modal-body>
+</c-modal>
+<!-- </c-modal> -->

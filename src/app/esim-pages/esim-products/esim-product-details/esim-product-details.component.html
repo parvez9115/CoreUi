@@ -1,0 +1,297 @@
+<button cButton class="floatingButton" (click)="export()" title="Export">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 1px"
+  ></i>
+</button>
+<p-toast key="toast1"></p-toast>
+<c-col
+  *ngIf="pagePermission?.add?.value == true"
+  style="display: flex; justify-content: flex-end; margin: 10px"
+>
+  <button
+    (click)="toggleModal()"
+    cButton
+    style="background-color: red; border-style: none"
+    class="custom-button"
+  >
+    Add
+  </button>
+</c-col>
+<div *ngIf="visibleLoader">
+  <c-modal
+    size="lg"
+    #Modal
+    alignment="center"
+    id="Modal"
+    [visible]="visible"
+    (visibleChange)="handleModalChange($event)"
+    ><c-modal-header>
+      <h4 *ngIf="formAction != 'edit'" cModalTitle>Add Product Details</h4>
+      <h4 *ngIf="formAction == 'edit'" cModalTitle>Edit Product Details</h4>
+    </c-modal-header>
+    <c-modal-body style="display: flex; justify-content: center">
+      <form cForm [formGroup]="saveProductDetails" style="width: 90%">
+        <c-col *ngIf="saveProductDetails.controls['productname'] as ctrl">
+          <label style="margin-bottom: 5px" for="productname"
+            >Product Name<span style="color: red"> *</span>
+          </label>
+          <input
+            cFormControl
+            formControlName="productname"
+            type="text"
+            class="form-control"
+            id="productname"
+            placeholder="Enter the product name"
+            [valid]="
+              ctrl.touched && ctrl.valid
+                ? true
+                : ctrl.touched && ctrl.invalid
+                ? false
+                : undefined
+            "
+          />
+        </c-col>
+        <c-col *ngIf="saveProductDetails.controls['description'] as ctrl">
+          <label style="margin-top: 10px; margin-bottom: 5px" for="description"
+            >Description<span style="color: red"> *</span>
+          </label>
+          <input
+            cFormControl
+            formControlName="description"
+            type="text"
+            class="form-control"
+            id="description"
+            placeholder="Enter the description"
+            [valid]="
+              ctrl.touched && ctrl.valid
+                ? true
+                : ctrl.touched && ctrl.invalid
+                ? false
+                : undefined
+            "
+          />
+        </c-col>
+        <c-col *ngIf="saveProductDetails.controls['productprice'] as ctrl">
+          <label style="margin-top: 10px; margin-bottom: 5px" for="productprice"
+            >Product Price<span style="color: red"> *</span>
+          </label>
+          <input
+            cFormControl
+            formControlName="productprice"
+            type="number"
+            class="form-control"
+            id="productprice"
+            placeholder="Enter the product price"
+            [valid]="
+              ctrl.touched && ctrl.valid
+                ? true
+                : ctrl.touched && ctrl.invalid
+                ? false
+                : undefined
+            "
+          />
+        </c-col>
+        <c-col *ngIf="saveProductDetails.controls['purchaserate'] as ctrl">
+          <label style="margin-top: 10px; margin-bottom: 5px" for="purchaserate"
+            >Purchase Rate<span style="color: red"> *</span>
+          </label>
+          <input
+            formControlName="purchaserate"
+            cFormControl
+            type="number"
+            class="form-control"
+            id="purchaserate"
+            placeholder="Enter the purchase rate"
+            [valid]="
+              ctrl.touched && ctrl.valid
+                ? true
+                : ctrl.touched && ctrl.invalid
+                ? false
+                : undefined
+            "
+          />
+        </c-col>
+
+        <c-col *ngIf="saveProductDetails.controls['validityperiod'] as ctrl">
+          <label
+            style="margin-top: 10px; margin-bottom: 5px"
+            for="validityperiod"
+            >Validity Period<span style="color: red"> *</span>
+          </label>
+
+          <p-dropdown
+            #companyDropdown
+            autoWidth="false"
+            [style]="{ width: '100%' }"
+            [options]="Topupplans"
+            optionValue="planValue"
+            optionLabel="years"
+            formControlName="validityperiod"
+            [showClear]="true"
+            placeholder="Select the validity period"
+          ></p-dropdown>
+        </c-col>
+
+        <c-col *ngIf="saveProductDetails.controls['cardstatus'] as ctrl">
+          <label style="margin-top: 10px; margin-bottom: 5px" for="cardstatus"
+            >Card Status<span style="color: red"> *</span>
+          </label>
+          <p-dropdown
+            #companyDropdown
+            autoWidth="false"
+            [style]="{ width: '100%' }"
+            [options]="esimStatus"
+            formControlName="cardstatus"
+            [showClear]="true"
+            placeholder="Enter the product status"
+          ></p-dropdown>
+          <!-- (onChange)="Change($event)" -->
+          <!-- <input
+            cFormControl
+            type="text"
+            formControlName="productstatus"
+            class="form-control"
+            id="productstatus"
+            placeholder="Enter Product Status"
+            
+          /> -->
+        </c-col>
+        <c-col *ngIf="saveProductDetails.controls['minorderqty'] as ctrl">
+          <label style="margin-top: 10px; margin-bottom: 5px" for="minorderqty"
+            >Minimum Order Quantity<span style="color: red"> *</span>
+          </label>
+          <input
+            cFormControl
+            formControlName="minorderqty"
+            type="number"
+            class="form-control"
+            id="minorderqty"
+            placeholder="Enter the minimum order quantity"
+            [valid]="
+              ctrl.touched && ctrl.valid
+                ? true
+                : ctrl.touched && ctrl.invalid
+                ? false
+                : undefined
+            "
+          />
+        </c-col>
+        <div class="d-flex justify-content-center mt-4">
+          <button
+            *ngIf="formAction == 'new'"
+            type="submit"
+            class="btn btn-primary"
+            (click)="submit('new')"
+            [disabled]="saveProductDetails.invalid"
+          >
+            Submit
+          </button>
+          <button
+            *ngIf="formAction == 'edit'"
+            type="submit"
+            class="btn btn-primary"
+            (click)="submit('edit')"
+            [disabled]="saveProductDetails.invalid"
+          >
+            Save
+          </button>
+          <div style="width: 10px"></div>
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </c-modal-body>
+  </c-modal>
+</div>
+
+<c-card *ngIf="pagePermission?.view?.value == true" class="mb-4">
+  <div style="display: flex; justify-content: flex-end">
+    <span class="p-input-icon-left" style="width: 40%; margin: 5px">
+      <i class="pi pi-search"></i>
+      <input
+        type="text"
+        pInputText
+        (change)="gridPagination.checkSearch($event)"
+        (keyup.enter)="handlePagination('first')"
+        [(ngModel)]="gridPagination.searchTerm"
+        style="width: 100%"
+        placeholder="Search grid"
+      />
+      <i
+        class="pi pi-times"
+        style="right: 4%;cursor: pointer;"
+        (click)="
+          gridPagination.searchTerm = '';
+          gridPagination.isSearched?handlePagination('first'):null;
+          gridPagination.isSearched=false;
+        "
+      ></i>
+    </span>
+    <button
+      style="margin: 5px"
+      type="submit"
+      class="btn btn-primary"
+      (click)="handlePagination('first')"
+      [disabled]="
+        gridPagination.searchTerm == undefined ||
+        gridPagination.searchTerm == ''
+      "
+    >
+      Search
+    </button>
+  </div>
+  <ag-grid-angular
+    #myGrid
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowData]="rowData"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    (gridReady)="onGridReady($event)"
+    rowAnimation
+    enableCellTextSelection
+  >
+  </ag-grid-angular>
+  <div class="paginationContainer">
+    <span class="paginationText">{{
+      gridPagination.totalRecords!=0? gridPagination.currentPage * 100 + 1:0
+    }}</span>
+    to <span class="paginationText">{{ gridPagination.toRecord }}</span> of
+    <span class="paginationText">{{ gridPagination.totalRecords }}</span>
+    <div style="display: flex; align-items: center">
+      <i
+        class="pi pi-fast-backward paginationIcon"
+        (click)="handlePagination('first')"
+      ></i>
+      <i
+        class="pi pi-caret-left paginationIcon"
+        (click)="handlePagination('previous')"
+      ></i>
+      Page
+      <span class="paginationText">{{ gridPagination.currentPage + 1 }}</span>
+      of {{ gridPagination.totalPages + 1 }}
+      <i
+        class="pi pi-caret-right paginationIcon"
+        (click)="handlePagination('next')"
+      ></i>
+      <i
+        class="pi pi-fast-forward paginationIcon"
+        (click)="handlePagination('last')"
+      ></i>
+    </div>
+  </div>
+</c-card>
+
+<c-modal [visible]="endisConfirm" #verticallyCenteredModal alignment="center">
+  <c-modal-header>
+    <h5 cModalTitle>Confirm</h5>
+    <button (click)="toggleConfirm()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>Are you sure you want to delete ?</c-modal-body>
+  <c-modal-footer>
+    <button (click)="delete()" cButton color="primary">Yes</button>
+    <button (click)="toggleConfirm()" cButton color="secondary">No</button>
+  </c-modal-footer>
+</c-modal>

@@ -1,0 +1,149 @@
+<c-card class="mb-4">
+  <p-toast key="toast1"></p-toast>
+
+  <c-nav variant="tabs">
+    <a
+      *ngIf="pagePermission?.searchrolegroup?.value"
+      [active]="pageselector"
+      (click)="changeMenu(1)"
+      [cTabContent]="tabContent"
+      [routerLink]
+      [tabPaneIdx]="0"
+      cNavLink
+      >Search Role Group</a
+    >
+    <a
+      *ngIf="pagePermission?.createrolegroup?.value"
+      [active]="pageselector1"
+      [cTabContent]="tabContent"
+      (click)="endis == false && changeMenu(2)"
+      [routerLink]
+      [tabPaneIdx]="1"
+      cNavLink
+      >{{ endis == true ? "Edit Role Group" : "Create Role Group" }}</a
+    >
+  </c-nav>
+  <c-tab-content #tabContent="cTabContent">
+    <c-tab-pane class="p-3">
+      <ag-grid-angular
+        #myGrid
+        [pagination]="true"
+        style="height: 100vh"
+        class="ag-theme-alpine"
+        [rowData]="rowData"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        rowAnimation
+        (gridReady)="onGridReady($event)"
+        enableCellTextSelection
+        [paginationPageSize]="selectedRowSize"
+      >
+      </ag-grid-angular>
+
+      <div
+        class="card flex justify-content-center"
+        style="position: absolute; bottom: 16px; margin: 0 0 6px 5px"
+      >
+        <p-dropdown
+          [(ngModel)]="selectedRowSize"
+          [style]="{ width: '100%', 'max-height': '35px' }"
+          [options]="[100, 200, 500, 1000]"
+        ></p-dropdown>
+      </div>
+    </c-tab-pane>
+    <c-tab-pane class="p-3">
+      <div style="width: 100%; display: flex; justify-content: center">
+        <c-input-group style="width: 36%" class="mb-3" sizing="sm">
+          <span cInputGroupText id="basic-addon1">Enter the Role Name </span>
+          <input
+            [readonly]="endis"
+            aria-describedby="basic-addon1"
+            aria-label="roleName"
+            cFormControl
+            [(ngModel)]="roleName"
+            placeholder="Enter the role name"
+          />
+        </c-input-group>
+      </div>
+      <ng-container
+        *ngFor="let node of loginData; index as i"
+        [ngTemplateOutlet]="treeNode"
+        [ngTemplateOutletContext]="{
+          $implicit: node,
+          index: i,
+          submenu: node,
+          childindex: undefined
+        }"
+      >
+      </ng-container>
+      <ng-template
+        #treeNode
+        let-data
+        let-i="index"
+        let-submenu="submenu"
+        let-childIndex="childindex"
+      >
+        <div
+          class="flex align-items-center"
+          [ngClass]="
+            data['value'] != 'false' && data['value'] != ''
+              ? 'checkedclass'
+              : 'uncheckedclass'
+          "
+        >
+          <p-checkbox
+            value="true"
+            (onChange)="manageTree($event, i, submenu, childIndex)"
+            [binary]="true"
+            [(ngModel)]="data['value']"
+            [disabled]="data.default == true"
+            inputId="binary"
+            name="val"
+          ></p-checkbox>
+          <label for="ny"
+            >{{ data.header == undefined ? data.activity : data.header }}
+          </label>
+
+          <ng-container *ngIf="data.value">
+            <ul>
+              <ng-container
+                *ngFor="let child of data.values; index as j"
+                [ngTemplateOutlet]="treeNode"
+                [ngTemplateOutletContext]="{
+                  $implicit: child,
+                  index: i,
+                  submenu: data,
+                  childindex: j
+                }"
+              >
+              </ng-container>
+            </ul>
+          </ng-container>
+        </div>
+      </ng-template>
+
+      <div style="display: flex; justify-content: center; margin-top: 10px">
+        <button
+          size="sm"
+          style="margin-left: 14px"
+          cButton
+          color="success"
+          variant="outline"
+          (click)="endis == true ? editData($event) : save($event)"
+        >
+          {{ endis == true ? "Save" : "Save" }}
+        </button>
+        <button
+          size="sm"
+          style="margin-left: 14px"
+          cButton
+          color="warning"
+          variant="outline"
+          (click)="Clear()"
+        >
+          Clear
+        </button>
+      </div>
+    </c-tab-pane>
+  </c-tab-content>
+</c-card>

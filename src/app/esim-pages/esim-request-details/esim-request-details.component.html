@@ -1,0 +1,112 @@
+<p-toast key="toast1"></p-toast>
+<button cButton class="floatingButton" title="Export" (click)="export()">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 2px"
+  ></i>
+</button>
+<div
+  class="card"
+  style="margin-bottom: 10px"
+  *ngIf="pagePermissions.view.value"
+>
+  <p-tabMenu
+    #tabMenu
+    class="caTabs"
+    [scrollable]="true"
+    [model]="tabs"
+    [activeItem]="activeTab"
+    (activeItemChange)="tabChanged($event)"
+  ></p-tabMenu>
+</div>
+<c-card class="mb-4" *ngIf="pagePermissions.view.value">
+  <ag-grid-angular
+    #myGrid
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowSelection]="'multiple'"
+    [rowData]="rowData"
+    [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    (gridReady)="onGridReady($event)"
+    rowAnimation
+    enableCellTextSelection
+    [pagination]="true"
+    [paginationPageSize]="selectedRowSize"
+  >
+  </ag-grid-angular>
+  <div
+    class="card flex justify-content-center"
+    style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+  >
+    <p-dropdown
+      [(ngModel)]="selectedRowSize"
+      [style]="{ width: '100% ', 'max-height': '35px ' }"
+      [options]="[100, 200, 500, 1000]"
+    ></p-dropdown>
+  </div>
+</c-card>
+
+<c-modal
+  #modalXl
+  id="modalXl"
+  size="xl"
+  *ngIf="detailsGridModalLoader"
+  [visible]="detailsGridModal"
+  (visibleChange)="handleDetailsGridModal($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>Details</h4>
+  </c-modal-header>
+  <c-modal-body>
+    <c-card class="mb-4">
+      <ag-grid-angular
+        #detailsGrid
+        style="height: 70vh"
+        class="ag-theme-alpine"
+        [rowSelection]="'multiple'"
+        [rowData]="detailsRowData"
+        [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+        [columnDefs]="detailsColumnDefs"
+        [defaultColDef]="defaultColDef"
+        rowAnimation
+        (gridReady)="getDetailsGridApi($event)"
+        enableCellTextSelection
+        [pagination]="true"
+        [paginationPageSize]="selectedRowSize"
+      >
+      </ag-grid-angular>
+      <div
+        class="card flex justify-content-center"
+        style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+      >
+        <p-dropdown
+          [(ngModel)]="selectedRowSize"
+          [style]="{ width: '100% ', 'max-height': '35px ' }"
+          [options]="[100, 200, 500, 1000]"
+        ></p-dropdown>
+      </div>
+    </c-card>
+  </c-modal-body>
+</c-modal>
+
+<c-modal [visible]="endisConfirm" #verticallyCenteredModal alignment="center">
+  <c-modal-header>
+    <h5 cModalTitle>Confirm</h5>
+    <button (click)="toggleConfirm()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>Are you sure you want to delete ?</c-modal-body>
+  <c-modal-footer>
+    <button (click)="delete()" cButton color="primary">Yes</button>
+    <button (click)="toggleConfirm()" cButton color="secondary">No</button>
+  </c-modal-footer>
+</c-modal>

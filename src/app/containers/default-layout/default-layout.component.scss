@@ -1,0 +1,27 @@
+c-sidebar {
+  --cui-sidebar-nav-link-active-bg: #ffffff4d;
+  --cui-sidebar-nav-link-hover-bg: #ffffff4d;
+}
+
+.loginButton {
+  min-width: 16em;
+  padding: 13.512px 16px;
+  padding-left: 0px;
+  display: flex;
+  justify-content: flex-start;
+  color: rgba(#ffffff, 0.5);
+}
+
+.loginButton svg {
+  position: relative;
+}
+
+.loginButton:hover {
+  background-color: #ffffff4d;
+  color: white;
+  cursor: pointer;
+}
+
+// .loginButton:hover svg {
+//   color: #fc440f;
+// }

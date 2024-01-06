@@ -1,0 +1,481 @@
+<form [formGroup]="invoiceForm">
+  <p-toast key="toast1"></p-toast>
+  <c-card>
+    <c-row>
+      <div style="width: 90%">
+        <div style="margin-left: 5px; color: red">Customer Name*</div>
+        <p-dropdown
+          formControlName="customerId"
+          [style]="{ width: '30%' }"
+          placeholder="Select a customer name"
+          [showClear]="true"
+          [options]="customers"
+          (onChange)="resetPayment()"
+          [filter]="true"
+          optionValue="contact_id"
+          optionLabel="contact_name"
+          filterBy="contact_name"
+        ></p-dropdown>
+      </div>
+
+      <!-- <div style="margin-top: 20px; margin-bottom: 15px; margin-left: 5px">
+        <div style="margin-left: 5px">Invoice No*</div>
+        <input
+          class="p-inputtext-sm"
+          pInputText
+          type="text"
+          formControlName="invoiceno"
+          style="width: 30%"
+          placeholder="Invoice Number"
+        />
+      </div> -->
+    </c-row>
+    <c-row>
+      <div style="width: 90%">
+        <div style="margin-left: 5px; color: red">Invoice Date*</div>
+        <input
+          class="p-inputtext-sm"
+          pInputText
+          type="date"
+          formControlName="invoicedate"
+          style="width: 30%"
+          placeholder="Invoice date"
+        />
+      </div>
+    </c-row>
+
+    <c-row>
+      <c-col>
+        <table bordered cTable>
+          <thead>
+            <tr>
+              <th style="font-size: 14px; font-weight: 500" scope="col">
+                ITEM DETAILS
+              </th>
+              <th style="font-size: 14px; font-weight: 500" scope="col">
+                QUANTITY
+              </th>
+              <th style="font-size: 14px; font-weight: 500" scope="col">
+                RATE
+              </th>
+              <!-- <th scope="col">Discount</th>
+              <th scope="col">Tax</th> -->
+              <th
+                style="font-size: 14px; font-weight: 500; border-right: none"
+                scope="col"
+              >
+                AMOUNT
+              </th>
+              <th
+                style="font-size: 14px; font-weight: 500; border-left: none"
+                scope="col"
+              ></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="
+                let data of invoiceForm.get('invoiceFields')['controls'];
+                let i = index
+              "
+              [@fadeOut]="'in'"
+              [formGroup]="data"
+            >
+              <td scope="row" style="width: 36.5%; border-left: none">
+                <p-dropdown
+                  formControlName="item"
+                  [style]="{ width: '100%', height: '20%' }"
+                  placeholder="Select a item name"
+                  [showClear]="true"
+                  (onChange)="setPrice($event, data)"
+                  [options]="items"
+                  [filter]="true"
+                  optionValue="item_id"
+                  optionLabel="item_name"
+                  filterBy="item_name"
+                ></p-dropdown>
+                <textarea
+                  *ngIf="
+                    data.get('item').value != '' &&
+                    data.get('item').value != undefined
+                  "
+                  formControlName="description"
+                  style="
+                    margin-top: 2px;
+                    border: none;
+                    resize: none;
+                    background-color: #fbfafa;
+                  "
+                  placeholder="Description"
+                  rows="2"
+                  cols="60"
+                  cFormControl
+                  id="exampleFormControlTextarea1"
+                ></textarea>
+              </td>
+              <td style="width: 10%">
+                <input
+                  class="p-inputtext-sm"
+                  pInputText
+                  type="number"
+                  (keyup)="rateWithQuantity($event, data)"
+                  formControlName="quantity"
+                  style="border: none"
+                  placeholder="Quantity"
+                />
+              </td>
+              <td>
+                <input
+                  class="p-inputtext-sm"
+                  pInputText
+                  (keyup)="rateWithQuantity($event, data)"
+                  formControlName="rate"
+                  style="border: none"
+                  type="number"
+                  placeholder="Rate"
+                />
+              </td>
+              <!-- <td>
+              <input
+                class="p-inputtext-sm"
+                style="border: none"
+                pInputText
+                type="text"
+                placeholder="Discount"
+              />
+              </td>
+
+             <td>
+              <input
+                style="border: none; width: 98% !important"
+                class="p-inputtext-sm"
+                pInputText
+                type="text"
+                placeholder="Tax"
+              />
+             </td> -->
+              <td style="border-right: none">
+                <input
+                  style="border: none"
+                  class="p-inputtext-sm"
+                  pInputText
+                  readonly
+                  formControlName="amount"
+                  step="0.01"
+                  type="number"
+                  placeholder="Amount"
+                />
+              </td>
+              <div
+                style="display: flex; justify-content: end; margin-bottom: 13%"
+              >
+                <p-button
+                  icon="pi pi-trash"
+                  styleClass="p-button-rounded p-button-danger"
+                  (click)="deleteRow(i)"
+                ></p-button>
+              </div>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan="5">
+                <p-button
+                  (click)="addRow()"
+                  icon="pi pi-plus"
+                  label="Add another line"
+                  styleClass="p-button-raised p-button-text p-button-sm"
+                >
+                </p-button>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </c-col>
+    </c-row>
+  </c-card>
+
+  <div style="width: 100%; display: flex; justify-content: end">
+    <div
+      style="
+        width: 43%;
+        background-color: #fbfafa;
+        padding: 20px;
+        border-radius: 20px;
+        margin: 10px;
+      "
+    >
+      <c-row style="justify-content: space-between">
+        <c-col xs="8" sm="4"> Sub Total </c-col>
+        <c-col xs="4" sm="8" style="justify-content: end"
+          >{{ subtotal + " " }}₹
+        </c-col>
+      </c-row>
+      <c-row>
+        <c-col xs="3" sm="4">Discount</c-col>
+        <c-col xs="6" sm="5"
+          ><input
+            class="discountInput"
+            type="number"
+            (keyup)="setDiscount($event)"
+            formControlName="discount"
+          />%</c-col
+        >
+        <c-col xs="3" sm="3" style="justify-content: end; padding-right: 20px"
+          >{{
+            invoiceForm.value.discount == null
+              ? 0
+              : invoiceForm.value.discount + " "
+          }}%
+        </c-col>
+      </c-row>
+      <!-- <c-row>
+        <c-col xs="5" sm="4" style="justify-content: space-around">
+          <c-col style="align-items: center">
+            <p-checkbox></p-checkbox>
+            <label style="margin: 4px">TDS</label>
+          </c-col>
+          <c-col>
+            <p-checkbox></p-checkbox>
+            <label style="margin: 4px">TCS</label>
+          </c-col>
+        </c-col>
+        <c-col xs="5" sm="5" style="display: block">
+          <p-dropdown
+            autoWidth="false"
+            [style]="{ width: '86%', height: '35px' }"
+          >
+          </p-dropdown>
+        </c-col>
+        <c-col xs="2" sm="3" style="justify-content: end; padding-right: 20px"
+          >0.00
+        </c-col>
+      </c-row>
+      <c-row>
+        <c-col
+          xs="4"
+          sm="4"
+          style="
+            border: 1px dashed #afafaf;
+            padding: 5px;
+            border-radius: 5px;
+            background-color: white;
+            justify-content: center;
+          "
+        >
+          Adjustment
+        </c-col>
+        <c-col xs="5" sm="5">
+          <input class="adjustmentInput" /><i
+            class="pi pi-question-circle"
+            style="font-size: 1rem; margin-left: 5px"
+          ></i>
+        </c-col>
+        <c-col xs="3" sm="3" style="justify-content: end; padding-right: 20px"
+          >0.00
+        </c-col>
+      </c-row> -->
+      <c-row style="justify-content: space-between">
+        <c-col xs="4">
+          <h5>Total(₹)</h5>
+        </c-col>
+        <c-col xs="8" sm="6w" style="justify-content: end"
+          ><h5 style="width: max-content">{{ total + " " }}₹</h5>
+        </c-col>
+      </c-row>
+    </div>
+  </div>
+
+  <p-toolbar>
+    <div style="width: 100%; display: flex; justify-content: space-between">
+      <p-button
+        (click)="toggleLiveDemo()"
+        label="View invoice"
+        styleClass="p-button-raised p-button-text"
+      ></p-button>
+      <div
+        *ngIf="invoiceForm.value.customerId"
+        style="
+          width: 60%;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
+        <div style="justify-items: center">
+          <p-checkbox
+            [(ngModel)]="paymentCheck"
+            [ngModelOptions]="{ standalone: true }"
+            value="true"
+          ></p-checkbox>
+          <label style="padding-left: 5px">I have recieved the payments</label>
+        </div>
+        <div
+          *ngIf="paymentCheck[0] ? true : false"
+          style="width: 50%; display: flex; align-items: center"
+        >
+          <label style="padding-right: 5px">Payment Mode:</label>
+          <div style="width: 50%">
+            <p-dropdown
+              formControlName="selectedPayment"
+              autoWidth="false"
+              [style]="{ width: '100%' }"
+              [options]="paymentOptions"
+            ></p-dropdown>
+          </div>
+        </div>
+      </div>
+      <p-splitButton
+        label="Save"
+        [disabled]="!invoiceForm.valid"
+        (onClick)="save()"
+        icon="pi pi-check"
+        [model]="toolbarsave"
+        styleClass="p-button-warning"
+      ></p-splitButton>
+    </div>
+  </p-toolbar>
+</form>
+
+<!-- <button cButton class="floatingButton" (click)="export()" title="Export">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 1px"
+  ></i>
+</button> -->
+<c-modal
+  #modalXl
+  id="modalXl"
+  size="xl"
+  [visible]="visiblePrint"
+  (visibleChange)="handlevisiblePrint($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>Invoice</h4>
+    <div>
+      <p-button (click)="print()" styleClass="p-button-raised p-button-text">
+        <svg cIcon name="cil-print" size="xl" title="Print"></svg>
+      </p-button>
+      <p-button (click)="download()" styleClass="p-button-raised p-button-text">
+        <svg
+          cIcon
+          name="cil-data-transfer-down"
+          size="xl"
+          title="download"
+        ></svg>
+      </p-button>
+      <p-button
+        (click)="visiblePrint = false"
+        label="Close"
+        styleClass="p-button-raised p-button-text"
+      ></p-button>
+    </div>
+  </c-modal-header>
+  <c-modal-body>
+    <div id="two" #two></div>
+  </c-modal-body>
+</c-modal>
+
+<c-modal
+  #fullScreen
+  [fullscreen]="true"
+  id="fullScreen"
+  #liveDemoModal
+  [visible]="visible"
+  (visibleChange)="handleLiveDemoChange($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>Invoice</h4>
+    <p-button
+      (click)="toggleLiveDemo()"
+      label="Close"
+      styleClass="p-button-raised p-button-text"
+    ></p-button>
+  </c-modal-header>
+  <c-modal-body>
+    <c-card *ngIf="pagePermission?.view?.value == true" class="mb-4">
+      <ag-grid-angular
+        #myGrid
+        style="height: 100vh"
+        class="ag-theme-alpine"
+        [rowData]="rowData"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        (gridReady)="onGridReady()"
+        rowAnimation
+        [pagination]="true"
+        enableCellTextSelection
+        [paginationPageSize]="selectedRowSize"
+      >
+      </ag-grid-angular>
+      <div
+        class="card flex justify-content-center"
+        style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+      >
+        <p-dropdown
+          [(ngModel)]="selectedRowSize"
+          [style]="{ width: '100%', 'max-height': '35px' }"
+          [options]="[100, 200, 500, 1000]"
+        ></p-dropdown>
+      </div>
+    </c-card>
+  </c-modal-body>
+</c-modal>
+
+<c-modal
+  size="lg"
+  #liveDemoModals
+  [visible]="visiblePay"
+  (visibleChange)="handlePayDemoChange($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>Record payment</h4>
+  </c-modal-header>
+  <c-modal-body>
+    <form [formGroup]="payForm">
+      <c-card class="mb-4">
+        <c-row>
+          <c-col>
+            <div class="p-inputgroup">
+              <button type="button" pButton label="Date"></button>
+              <input
+                formControlName="date"
+                type="date"
+                pInputText
+                placeholder="Date"
+              />
+            </div>
+          </c-col>
+          <c-col>
+            <div class="p-inputgroup">
+              <button type="button" pButton label="Amount"></button>
+              <input
+                type="number"
+                pInputText
+                placeholder="Amount"
+                formControlName="amount"
+              />
+            </div>
+          </c-col>
+        </c-row>
+        <c-row style="display: flex; justify-content: center">
+          <c-col style="display: flex; justify-content: end">
+            <p-button
+              (click)="payForm.valid == true ? savePaid() : null"
+              label="Save"
+              [disabled]="!payForm.valid"
+              styleClass="p-button-raised p-button-text"
+            ></p-button>
+          </c-col>
+          <c-col>
+            <p-button
+              (click)="togglePayDemo()"
+              label="Close"
+              styleClass="p-button-raised p-button-text p-button-secondary"
+            ></p-button>
+          </c-col>
+        </c-row>
+      </c-card>
+    </form>
+  </c-modal-body>
+</c-modal>

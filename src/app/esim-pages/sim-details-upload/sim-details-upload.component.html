@@ -1,0 +1,209 @@
+<p-toast key="toast1"></p-toast>
+<button cButton class="floatingButton" title="Export" (click)="export()">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 2px"
+  ></i>
+</button>
+<button
+  cButton
+  title="Import"
+  class="floatingButton"
+  (click)="downloadExcel()"
+  style="top: 69vh; background-color: rgb(211, 211, 0)"
+>
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 1px"
+  ></i>
+</button>
+<div class="card" style="margin-bottom: 1%">
+  <!-- <p-tabMenu
+    #tabMenu
+    class="caTabs"
+    [scrollable]="true"
+    [model]="tabs"
+    [activeItem]="activeTab"
+    (activeItemChange)="tabChanged($event)"
+  ></p-tabMenu> -->
+  <p-tabMenu
+    #tabMenu
+    class="caTabs"
+    [model]="tabs"
+    [activeItem]="activeTab"
+    (activeItemChange)="tabChanged($event)"
+  ></p-tabMenu>
+</div>
+
+<c-card style="border-left: 5px solid rgb(39, 90, 228)">
+  <c-card-body>
+    <form>
+      <c-row style="margin-top: 1%">
+        <c-col md="5" style="display: flex; margin-left: 15%">
+          <c-input-group
+            sizing="md"
+            class="mb-3"
+            style="
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 100%;
+            "
+          >
+            <input
+              cFormControl
+              #fileUpload
+              name="file"
+              [(ngModel)]="file"
+              (change)="onFileChange($event)"
+              id="inputGroupFile01"
+              type="file"
+            />
+          </c-input-group>
+        </c-col>
+
+        <c-col style="margin-top: -2px" md="4">
+          <div class="d-flex justify-content-center">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              (click)="upload()"
+              [disabled]="file == undefined || file == ''"
+            >
+              Submit
+            </button>
+            <div style="width: 10px"></div>
+            <button type="button" class="btn btn-secondary" (click)="clear()">
+              Clear
+            </button>
+          </div>
+
+          <!-- <button
+            size="sm"
+            style="margin-right: 5%; margin-left: 5%"
+            cButton
+            color="primary"
+            (click)="upload()"
+            variant="outline"
+            [disabled]="file == undefined || file == ''"
+          >
+            Submit
+          </button>
+
+          <button
+            size="sm"
+            cButton
+            (click)="clear()"
+            color="dark"
+            variant="outline"
+          >
+            Clear
+          </button> -->
+        </c-col>
+      </c-row>
+    </form>
+    <!-- <c-col style="display: flex; justify-content: center">
+      <div>
+        <button
+          style="margin-right: 10px; justify-self: flex-end"
+          size="sm"
+          cButton
+          color="primary"
+          (click)="upload()"
+          variant="outline"
+          [disabled]="file == undefined || file == ''"
+        >
+          Submit
+        </button>
+      </div>
+      <button
+        size="sm"
+        style="margin-left: 10px"
+        cButton
+        (click)="clear()"
+        color="dark"
+        variant="outline"
+      >
+        Clear
+      </button>
+    </c-col> -->
+  </c-card-body>
+</c-card>
+<!-- *ngIf="pagePermissions?.view?.value" -->
+<c-card style="margin-top: 1.5%" class="mb-4">
+  <div style="display: flex; justify-content: flex-end">
+    <span class="p-input-icon-left" style="width: 40%; margin: 5px">
+      <i class="pi pi-search"></i>
+      <input
+        type="text"
+        pInputText
+        (change)="gridPagination.checkSearch($event)"
+        (keyup.enter)="handlePagination('first')"
+        [(ngModel)]="gridPagination.searchTerm"
+        style="width: 100%"
+        placeholder="Search grid"
+      />
+      <i
+        class="pi pi-times"
+        style="right: 4%;cursor: pointer;"
+        (click)="
+          gridPagination.searchTerm = '';
+          gridPagination.isSearched?handlePagination('first'):null;
+          gridPagination.isSearched=false;
+        "
+      ></i>
+    </span>
+    <button
+      style="margin: 5px"
+      type="submit"
+      class="btn btn-primary"
+      (click)="handlePagination('first')"
+      [disabled]="
+        gridPagination.searchTerm == undefined ||
+        gridPagination.searchTerm == ''
+      "
+    >
+      Search
+    </button>
+  </div>
+  <ag-grid-angular
+    #myGrid
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowData]="rowData"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    (gridReady)="onGridReady($event)"
+    rowAnimation
+    enableCellTextSelection
+  >
+  </ag-grid-angular>
+  <div class="paginationContainer">
+    <span class="paginationText">{{
+      gridPagination.totalRecords!=0? gridPagination.currentPage * 100 + 1:0
+    }}</span>
+    to <span class="paginationText">{{ gridPagination.toRecord }}</span> of
+    <span class="paginationText">{{ gridPagination.totalRecords }}</span>
+    <div style="display: flex; align-items: center">
+      <i
+        class="pi pi-fast-backward paginationIcon"
+        (click)="handlePagination('first')"
+      ></i>
+      <i
+        class="pi pi-caret-left paginationIcon"
+        (click)="handlePagination('previous')"
+      ></i>
+      Page
+      <span class="paginationText">{{ gridPagination.currentPage + 1 }}</span>
+      of {{ gridPagination.totalPages + 1 }}
+      <i
+        class="pi pi-caret-right paginationIcon"
+        (click)="handlePagination('next')"
+      ></i>
+      <i
+        class="pi pi-fast-forward paginationIcon"
+        (click)="handlePagination('last')"
+      ></i>
+    </div>
+  </div>
+</c-card>

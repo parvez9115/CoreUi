@@ -1,0 +1,1137 @@
+<p-toast key="toast1"></p-toast>
+<button cButton class="floatingButton" title="Export" (click)="export()">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 2px"
+  ></i>
+</button>
+<c-row style="display: flex; justify-content: flex-end; margin: 10px">
+  <c-col style="max-width: max-content" *ngIf="userType">
+    <button cButton (click)="toggleModal(true)" class="custom-button">
+      Shipping Addresses
+    </button>
+  </c-col>
+  <c-col style="max-width: max-content" *ngIf="pagePermission?.add?.value">
+    <button cButton (click)="toggleLiveDemo()" class="custom-button">
+      Add
+    </button>
+  </c-col>
+</c-row>
+
+<c-card *ngIf="pagePermission?.view?.value == true" class="mb-4">
+  <div style="display: flex; justify-content: flex-end">
+    <span class="p-input-icon-left" style="width: 40%; margin: 5px">
+      <i class="pi pi-search"></i>
+      <input
+        type="text"
+        pInputText
+        (change)="gridPagination.checkSearch($event)"
+        [(ngModel)]="gridPagination.searchTerm"
+        (keyup.enter)="handlePagination('first')"
+        style="width: 100%"
+        placeholder="Search grid"
+      />
+      <i
+        class="pi pi-times"
+        style="right: 4%; cursor: pointer"
+        (click)="
+          gridPagination.searchTerm = '';
+          gridPagination.isSearched ? handlePagination('first') : null;
+          gridPagination.isSearched = false
+        "
+      ></i>
+    </span>
+    <button
+      style="margin: 5px"
+      type="submit"
+      class="btn btn-primary"
+      (click)="handlePagination('first')"
+      [disabled]="
+        gridPagination.searchTerm == undefined ||
+        gridPagination.searchTerm == ''
+      "
+    >
+      Search
+    </button>
+  </div>
+  <ag-grid-angular
+    #myGrid
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowData]="rowData"
+    [rowClassRules]="rowClassRules"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    rowAnimation
+    (gridReady)="onGridReady($event)"
+    enableCellTextSelection
+  >
+  </ag-grid-angular>
+  <div class="paginationContainer">
+    <span class="paginationText">{{
+      gridPagination.totalRecords != 0
+        ? gridPagination.currentPage * 100 + 1
+        : 0
+    }}</span>
+    to <span class="paginationText">{{ gridPagination.toRecord }}</span> of
+    <span class="paginationText">{{ gridPagination.totalRecords }}</span>
+    <div style="display: flex; align-items: center">
+      <i
+        class="pi pi-fast-backward paginationIcon"
+        (click)="handlePagination('first')"
+      ></i>
+      <i
+        class="pi pi-caret-left paginationIcon"
+        (click)="handlePagination('previous')"
+      ></i>
+      Page
+      <span class="paginationText">{{ gridPagination.currentPage + 1 }}</span>
+      of {{ gridPagination.totalPages + 1 }}
+      <i
+        class="pi pi-caret-right paginationIcon"
+        (click)="handlePagination('next')"
+      ></i>
+      <i
+        class="pi pi-fast-forward paginationIcon"
+        (click)="handlePagination('last')"
+      ></i>
+    </div>
+  </div>
+</c-card>
+<div *ngIf="visibleLoader">
+  <c-modal
+    size="xl"
+    #liveDemoModal
+    id="liveDemoModal"
+    [visible]="visible"
+    (visibleChange)="handleLiveDemoChange($event)"
+  >
+    <c-modal-header>
+      <h4 cModalTitle>
+        {{ formAction == "new" ? "Create New User" : "Edit User" }}
+      </h4>
+    </c-modal-header>
+    <c-modal-body>
+      <form cForm [formGroup]="userForm">
+        <div>
+          <div class="d-flex justify-content-between mb-1.5">
+            <h5>Login Details</h5>
+          </div>
+          <div class="form-group">
+            <c-row>
+              <c-col *ngIf="userForm.controls['primaryemail'] as ctrl">
+                <label for="primaryemail"
+                  >Primary Email <span style="color: red">*</span></label
+                >
+                <input
+                  cFormControl
+                  formControlName="primaryemail"
+                  type="email"
+                  class="form-control"
+                  id="primaryemail"
+                  [readOnly]="endisCon"
+                  placeholder="Enter the primary email"
+                  [valid]="
+                    ctrl.touched && ctrl.valid
+                      ? true
+                      : ctrl.touched && ctrl.invalid
+                      ? false
+                      : undefined
+                  "
+                /><c-form-feedback *ngIf="ctrl.invalid" [valid]="!ctrl.invalid">
+                  <ng-container *ngIf="ctrl.errors as errors">
+                    <div *ngIf="errors['email']">Enter a Valid Email</div>
+                  </ng-container>
+                </c-form-feedback>
+              </c-col>
+              <c-col *ngIf="userForm.controls['secondaryemail'] as ctrl">
+                <label for="secondaryemail">Secondary Email</label>
+                <input
+                  cFormControl
+                  formControlName="secondaryemail"
+                  type="email"
+                  class="form-control"
+                  id="secondaryemail"
+                  placeholder="Enter the secondary email"
+                  [valid]="
+                    ctrl.touched && ctrl.valid
+                      ? true
+                      : ctrl.touched && ctrl.invalid
+                      ? false
+                      : undefined
+                  "
+                />
+                <c-form-feedback *ngIf="ctrl.invalid" [valid]="!ctrl.invalid">
+                  <ng-container *ngIf="ctrl.errors as errors">
+                    <div *ngIf="errors['email']">Enter a Valid Email</div>
+                  </ng-container>
+                </c-form-feedback>
+              </c-col>
+            </c-row>
+            <c-row>
+              <c-col *ngIf="this.formAction == 'edit'">
+                <div *ngIf="userForm.controls['password'] as ctrl">
+                  <label for="password">Password</label>
+                  <div
+                    style="
+                      position: relative;
+                      display: flex;
+                      justify-content: end;
+                    "
+                  >
+                    <input
+                      cFormControl
+                      formControlName="password"
+                      type="{{ password_type }}"
+                      [readOnly]="endisCon"
+                      class="form-control"
+                      id="password"
+                      placeholder="Enter the password"
+                    />
+                    <i
+                      [ngClass]="eye_icon ? 'pi pi-eye' : 'pi pi-eye-slash'"
+                      style="
+                        font-size: 1.2rem;
+                        position: absolute;
+                        margin-right: 10px;
+                        top: 22%;
+                      "
+                      (click)="showHidePass()"
+                    ></i>
+                  </div>
+                </div>
+              </c-col>
+              <c-col
+                *ngIf="userForm.controls['roleid'] as ctrl"
+                style="max-width: 50%; margin-top: 10px"
+              >
+                <label for="roleid"
+                  >Role Name <span style="color: red">*</span></label
+                >
+                <p-dropdown
+                  autoWidth="false"
+                  [style]="{ width: '100%' }"
+                  [options]="activerolelist"
+                  optionValue="roleid"
+                  optionLabel="rolename"
+                  [filter]="true"
+                  filterBy="name"
+                  formControlName="roleid"
+                  [showClear]="true"
+                  placeholder="Select the role name"
+                >
+                  <ng-template let-role pTemplate="item">
+                    <div class="flex align-items-center gap-2">
+                      <div>{{ role.rolename }}</div>
+                    </div>
+                  </ng-template>
+                </p-dropdown>
+              </c-col>
+            </c-row>
+          </div>
+        </div>
+        <div>
+          <div class="d-flex justify-content-between mb-1.5 mt-4">
+            <h5>User Details</h5>
+          </div>
+          <div class="form-group">
+            <c-row>
+              <c-col *ngIf="userForm.controls['firstname'] as ctrl">
+                <label for="firstName"
+                  >First Name <span style="color: red">*</span></label
+                >
+                <input
+                  cFormControl
+                  formControlName="firstname"
+                  type="text"
+                  class="form-control"
+                  id="firstName"
+                  placeholder="Enter the first name"
+                  [valid]="
+                    ctrl.touched && ctrl.valid
+                      ? true
+                      : ctrl.touched && ctrl.invalid
+                      ? false
+                      : undefined
+                  "
+                />
+              </c-col>
+              <c-col *ngIf="userForm.controls['lastname'] as ctrl">
+                <label for="lastName">Last Name</label>
+                <input
+                  cFormControl
+                  formControlName="lastname"
+                  type="text"
+                  class="form-control"
+                  id="lastName"
+                  placeholder="Enter the last name"
+                  [valid]="
+                    ctrl.touched && ctrl.valid
+                      ? true
+                      : ctrl.touched && ctrl.invalid
+                      ? false
+                      : undefined
+                  "
+                />
+              </c-col>
+            </c-row>
+          </div>
+
+          <div class="form-group">
+            <c-row style="margin-top: 10px" class="margin">
+              <c-col *ngIf="userForm.controls['primarycontactno'] as ctrl">
+                <label for="contactNumber"
+                  >Primary Contact Number
+                  <span style="color: red">*</span></label
+                >
+                <input
+                  cFormControl
+                  formControlName="primarycontactno"
+                  type="number"
+                  class="form-control"
+                  (input)="enforceMaxLength($event, 10)"
+                  [readOnly]="endisCon"
+                  id="contactNumber"
+                  placeholder="Enterthe primary contact number"
+                  [valid]="
+                    ctrl.touched && ctrl.valid
+                      ? true
+                      : ctrl.touched && ctrl.invalid
+                      ? false
+                      : undefined
+                  "
+                />
+                <c-form-feedback *ngIf="ctrl.invalid" [valid]="!ctrl.invalid">
+                  <ng-container *ngIf="ctrl.errors as errors">
+                    <div *ngIf="errors['minlength']">
+                      Enter a 10 Digit Number
+                    </div>
+                  </ng-container>
+                </c-form-feedback>
+              </c-col>
+              <c-col *ngIf="userForm.controls['secondarycontactno'] as ctrl">
+                <label for="secondarycontactno">Secondary Contact Number</label>
+                <input
+                  cFormControl
+                  formControlName="secondarycontactno"
+                  type="number"
+                  class="form-control"
+                  (input)="enforceMaxLength($event, 10)"
+                  id="secondarycontactno"
+                  placeholder="Enter the secondary contact number"
+                  [valid]="
+                    ctrl.touched && ctrl.valid
+                      ? true
+                      : ctrl.touched && ctrl.invalid
+                      ? false
+                      : undefined
+                  "
+                />
+                <c-form-feedback *ngIf="ctrl.invalid" [valid]="!ctrl.invalid">
+                  <ng-container *ngIf="ctrl.errors as errors">
+                    <div *ngIf="errors['minlength']">
+                      Enter a 10 Digit Number
+                    </div>
+                  </ng-container>
+                </c-form-feedback>
+              </c-col>
+            </c-row>
+          </div>
+          <div class="form-group">
+            <c-row style="margin-top: 10px">
+              <c-col *ngIf="userForm.controls['idtype'] as ctrl">
+                <label for="idtype"> Id Proof type</label>
+
+                <p-dropdown
+                  autoWidth="false"
+                  [style]="{ width: '100%' }"
+                  [filter]="true"
+                  filterBy="idname"
+                  placeholder="Select Id Type"
+                  formControlName="idtype"
+                  [options]="idtype"
+                  optionValue="idname"
+                  optionLabel="idname"
+                  [showClear]="true"
+                ></p-dropdown>
+              </c-col>
+              <c-col *ngIf="userForm.controls['idno'] as ctrl">
+                <label for="idno"> Id Proof No</label>
+                <input
+                  cFormControl
+                  formControlName="idno"
+                  type="text"
+                  class="form-control"
+                  id="idno"
+                  placeholder="Enter the Id no"
+                  [valid]="
+                    ctrl.touched && ctrl.valid
+                      ? true
+                      : ctrl.touched && ctrl.invalid
+                      ? false
+                      : undefined
+                  "
+                />
+              </c-col>
+            </c-row>
+          </div>
+          <!-- <div class="form-group">
+            <c-row>
+              <c-col *ngIf="userForm.controls['contactno'] as ctrl">
+                <label for="contactNumber">Contact Number</label>
+                <input
+                  cFormControl
+                  formControlName="contactno"
+                  type="number"
+                  class="form-control"
+                  id="contactNumber"
+                  placeholder="Enter contact number"
+                  [valid]="
+                    ctrl.touched && ctrl.valid
+                      ? true
+                      : ctrl.touched && ctrl.invalid
+                      ? false
+                      : undefined
+                  "
+                />
+              </c-col>
+              <c-col *ngIf="userForm.controls['contactno'] as ctrl">
+                <label for="contactNumber">Contact Number</label>
+                <input
+                  cFormControl
+                  formControlName="contactno"
+                  type="number"
+                  class="form-control"
+                  id="contactNumber"
+                  placeholder="Enter contact number"
+                  [valid]="
+                    ctrl.touched && ctrl.valid
+                      ? true
+                      : ctrl.touched && ctrl.invalid
+                      ? false
+                      : undefined
+                  "
+                />
+              </c-col>
+            </c-row>
+          </div> -->
+          <!-- <div class="form-group">
+            <c-row>
+              <c-col *ngIf="userForm.controls['contactno'] as ctrl">
+                <label for="contactNumber">Contact Number</label>
+                <input
+                  cFormControl
+                  formControlName="contactno"
+                  type="number"
+                  class="form-control"
+                  id="contactNumber"
+                  placeholder="Enter contact number"
+                  [valid]="
+                    ctrl.touched && ctrl.valid
+                      ? true
+                      : ctrl.touched && ctrl.invalid
+                      ? false
+                      : undefined
+                  "
+                />
+              </c-col>
+              <c-col *ngIf="userForm.controls['contactno'] as ctrl">
+                <label for="contactNumber">Contact Number</label>
+                <input
+                  cFormControl
+                  formControlName="contactno"
+                  type="number"
+                  class="form-control"
+                  id="contactNumber"
+                  placeholder="Enter contact number"
+                  [valid]="
+                    ctrl.touched && ctrl.valid
+                      ? true
+                      : ctrl.touched && ctrl.invalid
+                      ? false
+                      : undefined
+                  "
+                />
+              </c-col>
+            </c-row>
+          </div> -->
+        </div>
+
+        <!-- <div class="onoffswitch">
+          <input
+            type="checkbox"
+            formControlName="status"
+            name="onoffswitch"
+            class="onoffswitch-checkbox"
+            id="myonoffswitch"
+          />
+  
+          <label class="onoffswitch-label" for="myonoffswitch">
+            <span class="onoffswitch-inner"></span>
+            <span class="onoffswitch-switch"></span>
+          </label>
+        </div> -->
+        <div class="onoffswitch">
+          <input
+            type="checkbox"
+            formControlName="status"
+            name="onoffswitch"
+            class="onoffswitch-checkbox"
+            id="myonoffswitch"
+          />
+
+          <label class="onoffswitch-label" for="myonoffswitch">
+            <span class="onoffswitch-inner"></span>
+            <span class="onoffswitch-switch"></span>
+          </label>
+        </div>
+
+        <div class="d-flex justify-content-center mt-4">
+          <button
+            *ngIf="formAction == 'new'"
+            type="submit"
+            class="btn btn-primary"
+            (click)="onSubmit('submit', $event)"
+            [disabled]="userForm.pristine || userForm.invalid"
+          >
+            Submit
+          </button>
+          <button
+            *ngIf="formAction == 'edit'"
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="userForm.invalid"
+            (click)="onSubmit('edit', $event)"
+          >
+            Edit
+          </button>
+          <div style="width: 10px"></div>
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </c-modal-body>
+  </c-modal>
+</div>
+
+<div *ngIf="addressModalLoader">
+  <c-modal
+    class="modal"
+    size="lg"
+    #Modal
+    alignment="center"
+    id="Modal"
+    [visible]="addressModal"
+    (visibleChange)="handleAddressModalChange($event)"
+    ><c-modal-header>
+      <h4 cModalTitle>Shipping Addresses</h4>
+      <div>
+        <p-button
+          styleClass="p-button-raised p-button-text"
+          label="Close"
+          (click)="toggleModal()"
+        >
+        </p-button>
+      </div>
+    </c-modal-header>
+    <c-modal-body style="padding: 0">
+      <div [visible]="collapseVisible" cCollapse style="margin: 1em">
+        <!-- <textarea
+          [(ngModel)]="address"
+          class="textArea"
+          style="
+            margin-top: 4px;
+            border: none;
+            resize: none;
+            height: max-content;
+            width: 100%;
+          "
+          placeholder="Enter your address"
+          rows="2"
+          cols="50"
+          cFormControl
+          id="exampleFormControlTextarea1"
+        ></textarea>
+        <p-button
+          [style]="{ margin: '10px' }"
+          [disabled]="address == '' || address == undefined"
+          styleClass="p-button-raised p-button-text"
+          label="Save"
+          (click)="saveAddress()"
+        >
+        </p-button> -->
+        <form [formGroup]="addressform">
+          <c-row style="padding: 0px">
+            <c-col sm="1.8" style="font-weight: 550"> Address : </c-col>
+            <c-col>
+              <input
+                style="margin-top: 5px"
+                type="text"
+                class="form-control"
+                formControlName="address"
+                placeholder="Enter the address"
+                cFormControl
+                id="productname"
+              />
+            </c-col>
+          </c-row>
+
+          <c-row style="padding: 3px">
+            <c-col sm="6" style="font-weight: 550"> Country : </c-col>
+            <c-col sm="6" style="font-weight: 550"> State : </c-col>
+          </c-row>
+
+          <c-row style="padding: 0px">
+            <c-col sm="6">
+              <p-dropdown
+                autoWidth="false"
+                [style]="{ width: '370px', 'border-radius': '5px' }"
+                [filter]="true"
+                filterBy="name"
+                placeholder="Select the country"
+                formControlName="country"
+                [options]="countries"
+                optionValue="name"
+                optionLabel="name"
+                (onChange)="onChangeCountry($event, 'country')"
+              ></p-dropdown>
+            </c-col>
+            <c-col sm="6">
+              <p-dropdown
+                autoWidth="false"
+                [style]="{ width: '370px', 'border-radius': '5px' }"
+                [filter]="true"
+                filterBy="name"
+                placeholder="Select the state"
+                formControlName="state"
+                [options]="state"
+                optionValue="name"
+                optionLabel="name"
+                (onChange)="onChangeState($event, 'state')"
+              ></p-dropdown>
+            </c-col>
+          </c-row>
+
+          <c-row style="padding: 3px">
+            <c-col sm="6" style="font-weight: 550"> City : </c-col>
+            <c-col sm="6" style="font-weight: 550"> Pin Code : </c-col>
+          </c-row>
+
+          <c-row style="padding: 0px">
+            <c-col>
+              <p-dropdown
+                autoWidth="false"
+                [style]="{ width: '370px', 'border-radius': '5px' }"
+                [filter]="true"
+                filterBy="name"
+                placeholder="Select the city"
+                formControlName="city"
+                [options]="city"
+                optionValue="name"
+                optionLabel="name"
+              ></p-dropdown>
+            </c-col>
+            <c-col>
+              <input
+                sm="6"
+                style="margin-top: 5px"
+                type="text"
+                class="form-control"
+                formControlName="pincode"
+                placeholder="Enter the pin code"
+                cFormControl
+                id="pincode"
+              />
+            </c-col>
+          </c-row>
+        </form>
+        <c-row>
+          <c-col style="text-align: center">
+            <p-button
+              [style]="{ margin: '10px' }"
+              [disabled]="addressform.invalid"
+              styleClass="p-button-raised p-button-text"
+              label="Save"
+              (click)="saveAddress()"
+            >
+            </p-button> </c-col
+        ></c-row>
+      </div>
+      <c-row
+        style="justify-content: end; margin: 10px 1em 0px; max-width: 100%"
+      >
+        <button size="sm" cButton color="primary" (click)="collapseTab()">
+          <svg
+            cIcon
+            name="{{ collapseVisible ? 'cilArrowTop' : 'cilArrowBottom' }}"
+          ></svg>
+          {{ collapseVisible ? "Close" : "Add Address" }}
+        </button>
+      </c-row>
+      <div style="height: 60vh; overflow-y: scroll">
+        <c-card style="margin: 1em" *ngFor="let address of addresses">
+          <c-card-body>
+            <c-row>
+              <c-col>
+                <p cCardText>
+                  {{ address.full_address }}
+                </p></c-col
+              >
+              <c-col style="text-align: end">
+                <p-button
+                  [style]="{ padding: '6px 10px', 'margin-right': '5px' }"
+                  styleClass="p-button-raised p-button-text"
+                  label="Edit"
+                  (click)="editAddress(address)"
+                >
+                </p-button>
+                <p-button
+                  [style]="{ padding: '6px 10px', color: 'red' }"
+                  styleClass="p-button-raised p-button-text"
+                  label="Delete"
+                  (click)="handleConfirm(address)"
+                >
+                </p-button
+              ></c-col>
+            </c-row>
+          </c-card-body>
+        </c-card>
+      </div>
+    </c-modal-body>
+  </c-modal>
+</div>
+
+<c-modal
+  [visible]="endisConfirm"
+  (visibleChange)="endisConfirmModal($event)"
+  #verticallyCenteredModal
+  alignment="center"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Confirm</h5>
+    <button (click)="toggleConfirm()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>Are you sure you want to delete ?</c-modal-body>
+  <c-modal-footer>
+    <button (click)="delete()" cButton color="primary">Yes</button>
+    <button (click)="toggleConfirm()" cButton color="secondary">No</button>
+  </c-modal-footer>
+</c-modal>
+
+<div *ngIf="editCompanyLoader">
+  <c-modal
+    size="xl"
+    #liveDemoModal
+    id="liveDemoModal"
+    [visible]="editCompanyModal"
+    (visibleChange)="handleEditCompanyModal($event)"
+  >
+    <c-modal-header>
+      <h4 cModalTitle>
+        {{ "Edit Company" }}
+      </h4>
+    </c-modal-header>
+    <c-modal-body>
+      <form cForm [formGroup]="companyForm">
+        <div>
+          <div class="d-flex justify-content-between mb-1.5">
+            <h5>Login Details</h5>
+          </div>
+          <div class="form-group">
+            <c-row>
+              <c-col *ngIf="companyForm.controls['primaryemail'] as ctrl">
+                <label for="primaryemail"
+                  >Primary Email <span style="color: red">*</span></label
+                >
+                <input
+                  cFormControl
+                  formControlName="primaryemail"
+                  type="email"
+                  class="form-control"
+                  id="companyprimaryemail"
+                  [readonly]="true"
+                  placeholder="Enter the primary email"
+                  [valid]="
+                    ctrl.touched && ctrl.valid
+                      ? true
+                      : ctrl.touched && ctrl.invalid
+                      ? false
+                      : undefined
+                  "
+                /><c-form-feedback *ngIf="ctrl.invalid" [valid]="!ctrl.invalid">
+                  <ng-container *ngIf="ctrl.errors as errors">
+                    <div *ngIf="errors['email']">Enter a Valid Email</div>
+                  </ng-container>
+                </c-form-feedback>
+              </c-col>
+              <c-col *ngIf="companyForm.controls['secondaryemail'] as ctrl">
+                <label for="secondaryemail">Secondary Email</label>
+                <input
+                  cFormControl
+                  formControlName="secondaryemail"
+                  type="email"
+                  class="form-control"
+                  id="companycompanysecondaryemail"
+                  placeholder="Enter the secondary email"
+                  [valid]="
+                    ctrl.touched && ctrl.valid
+                      ? true
+                      : ctrl.touched && ctrl.invalid
+                      ? false
+                      : undefined
+                  "
+                />
+                <c-form-feedback *ngIf="ctrl.invalid" [valid]="!ctrl.invalid">
+                  <ng-container *ngIf="ctrl.errors as errors">
+                    <div *ngIf="errors['email']">Enter a Valid Email</div>
+                  </ng-container>
+                </c-form-feedback>
+              </c-col>
+            </c-row>
+            <c-row>
+              <div style="max-width: 50%">
+                <c-col *ngIf="companyForm.controls['password'] as ctrl">
+                  <label for="password">Password</label>
+                  <div
+                    style="
+                      position: relative;
+                      display: flex;
+                      justify-content: end;
+                    "
+                  >
+                    <input
+                      cFormControl
+                      formControlName="password"
+                      type="{{ password_type }}"
+                      class="form-control"
+                      id="companypassword"
+                      placeholder="Enter the password"
+                    />
+                    <i
+                      [ngClass]="eye_icon ? 'pi pi-eye' : 'pi pi-eye-slash'"
+                      style="
+                        font-size: 1.2rem;
+                        position: absolute;
+                        margin-right: 10px;
+                        top: 22%;
+                      "
+                      (click)="showHidePass()"
+                    ></i>
+                  </div>
+                </c-col>
+              </div>
+            </c-row>
+          </div>
+          <div>
+            <div class="d-flex justify-content-between mb-1.5 mt-4">
+              <h5>User Details</h5>
+            </div>
+            <div class="form-group">
+              <c-row>
+                <c-col *ngIf="companyForm.controls['firstname'] as ctrl">
+                  <label for="firstName"
+                    >First Name <span style="color: red">*</span></label
+                  >
+                  <input
+                    cFormControl
+                    formControlName="firstname"
+                    type="text"
+                    class="form-control"
+                    id="companyfirstName"
+                    placeholder="Enter the first name"
+                    [valid]="
+                      ctrl.touched && ctrl.valid
+                        ? true
+                        : ctrl.touched && ctrl.invalid
+                        ? false
+                        : undefined
+                    "
+                  />
+                </c-col>
+                <c-col *ngIf="companyForm.controls['lastname'] as ctrl">
+                  <label for="lastName">Last Name</label>
+                  <input
+                    cFormControl
+                    formControlName="lastname"
+                    type="text"
+                    class="form-control"
+                    id="companylastName"
+                    placeholder="Enter the last name"
+                    [valid]="
+                      ctrl.touched && ctrl.valid
+                        ? true
+                        : ctrl.touched && ctrl.invalid
+                        ? false
+                        : undefined
+                    "
+                  />
+                </c-col>
+              </c-row>
+            </div>
+
+            <div class="form-group">
+              <c-row>
+                <c-col *ngIf="companyForm.controls['primarycontactno'] as ctrl">
+                  <label for="contactNumber"
+                    >Primary Contact Number
+                    <span style="color: red">*</span></label
+                  >
+                  <input
+                    cFormControl
+                    formControlName="primarycontactno"
+                    type="number"
+                    class="form-control"
+                    [readonly]="true"
+                    id="companycontactNumber"
+                    placeholder="Enter the primary contact number"
+                    [valid]="
+                      ctrl.touched && ctrl.valid
+                        ? true
+                        : ctrl.touched && ctrl.invalid
+                        ? false
+                        : undefined
+                    "
+                  />
+                  <c-form-feedback *ngIf="ctrl.invalid" [valid]="!ctrl.invalid">
+                    <ng-container *ngIf="ctrl.errors as errors">
+                      <div *ngIf="errors['minlength']">
+                        Enter a 10 Digit Number
+                      </div>
+                    </ng-container>
+                  </c-form-feedback>
+                </c-col>
+                <c-col
+                  *ngIf="companyForm.controls['secondarycontactno'] as ctrl"
+                >
+                  <label for="secondarycontactno"
+                    >Secondary Contact Number</label
+                  >
+                  <input
+                    cFormControl
+                    formControlName="secondarycontactno"
+                    type="number"
+                    class="form-control"
+                    id="companysecondarycontactno"
+                    (input)="enforceMaxLength($event, 10)"
+                    placeholder="Enter the secondary contact number"
+                    [valid]="
+                      ctrl.touched && ctrl.valid
+                        ? true
+                        : ctrl.touched && ctrl.invalid
+                        ? false
+                        : undefined
+                    "
+                  />
+                  <c-form-feedback *ngIf="ctrl.invalid" [valid]="!ctrl.invalid">
+                    <ng-container *ngIf="ctrl.errors as errors">
+                      <div *ngIf="errors['minlength']">
+                        Enter a 10 Digit Number
+                      </div>
+                    </ng-container>
+                  </c-form-feedback>
+                </c-col>
+              </c-row>
+            </div>
+
+            <div class="form-group">
+              <c-row>
+                <c-col *ngIf="companyForm.controls['companyname'] as ctrl">
+                  <label for="companyname"
+                    >Company Name <span style="color: red">*</span></label
+                  >
+                  <input
+                    cFormControl
+                    formControlName="companyname"
+                    type="text"
+                    class="form-control"
+                    id="companycompanyname"
+                    placeholder="Enter the company name"
+                    [valid]="
+                      ctrl.touched && ctrl.valid
+                        ? true
+                        : ctrl.touched && ctrl.invalid
+                        ? false
+                        : undefined
+                    "
+                  />
+                </c-col>
+                <c-col
+                  *ngIf="companyForm.controls['companydisplayname'] as ctrl"
+                >
+                  <label for="companydisplayname"> Company Display Name</label>
+                  <input
+                    formControlName="companydisplayname"
+                    cFormControl
+                    type="text"
+                    class="form-control"
+                    id="companycompanydisplayname"
+                    placeholder="Enter the display name"
+                    [valid]="
+                      ctrl.touched && ctrl.valid
+                        ? true
+                        : ctrl.touched && ctrl.invalid
+                        ? false
+                        : undefined
+                    "
+                  />
+                </c-col>
+              </c-row>
+              <c-row>
+                <c-col *ngIf="companyForm.controls['idtype'] as ctrl">
+                  <label for="idtype"> Id Proof type</label>
+
+                  <p-dropdown
+                    autoWidth="false"
+                    [style]="{ width: '100%' }"
+                    [filter]="true"
+                    filterBy="idname"
+                    placeholder="Select id type"
+                    formControlName="idtype"
+                    [options]="idtype"
+                    optionValue="idname"
+                    optionLabel="idname"
+                  ></p-dropdown>
+                </c-col>
+                <c-col *ngIf="companyForm.controls['idno'] as ctrl">
+                  <label for="idno"> Id Proof No</label>
+                  <input
+                    cFormControl
+                    formControlName="idno"
+                    type="text"
+                    class="form-control"
+                    id="companyidno"
+                    placeholder="Enter the id no"
+                    [valid]="
+                      ctrl.touched && ctrl.valid
+                        ? true
+                        : ctrl.touched && ctrl.invalid
+                        ? false
+                        : undefined
+                    "
+                  />
+                </c-col>
+              </c-row>
+              <c-row style="padding-top: 10px">
+                <c-col style="max-width: 50%">
+                  <p-accordion>
+                    <p-accordionTab header="Billing Address">
+                      <!-- (click)="copyAddress('fromshipping')" -->
+                      <c-row>
+                        <c-col style="display: flex; justify-content: end">
+                          <div style="color: transparent; cursor: default">
+                            Copy Address
+                          </div>
+                        </c-col>
+                      </c-row>
+                      <c-row>
+                        <c-col
+                          *ngIf="companyForm.controls['billingcountry'] as ctrl"
+                        >
+                          <label for="billingcountry">Country</label>
+                          <p-dropdown
+                            autoWidth="false"
+                            [style]="{ width: '100%' }"
+                            [filter]="true"
+                            filterBy="name"
+                            placeholder="Select a country"
+                            formControlName="billingcountry"
+                            [options]="countries"
+                            optionValue="name"
+                            optionLabel="name"
+                            (onChange)="onChangeCountry($event)"
+                          ></p-dropdown>
+                        </c-col>
+                      </c-row>
+                      <c-row
+                        ><c-col
+                          *ngIf="companyForm.controls['billingstate'] as ctrl"
+                        >
+                          <label for="billingstate">State</label>
+                          <p-dropdown
+                            autoWidth="false"
+                            [style]="{ width: '100%' }"
+                            [filter]="true"
+                            filterBy="name"
+                            placeholder="Select state"
+                            formControlName="billingstate"
+                            [options]="billingstate"
+                            optionValue="name"
+                            optionLabel="name"
+                          ></p-dropdown> </c-col
+                      ></c-row>
+                      <c-row>
+                        <c-col
+                          *ngIf="companyForm.controls['billingcity'] as ctrl"
+                        >
+                          <label for="billingcity">City</label>
+                          <input
+                            cFormControl
+                            formControlName="billingcity"
+                            type="text"
+                            class="form-control"
+                            id="billingcity"
+                            placeholder="Enter the city name"
+                            [valid]="
+                              ctrl.touched && ctrl.valid
+                                ? true
+                                : ctrl.touched && ctrl.invalid
+                                ? false
+                                : undefined
+                            "
+                          />
+                        </c-col>
+                      </c-row>
+                      <c-row>
+                        <c-col
+                          *ngIf="companyForm.controls['billingaddress'] as ctrl"
+                        >
+                          <label for="billingaddress">Address</label>
+                          <textarea
+                            formControlName="billingaddress"
+                            rows="2"
+                            cols="60"
+                            cFormControl
+                            type="text"
+                            class="form-control"
+                            id="billingaddress"
+                            placeholder="Enter the billing address"
+                            [valid]="
+                              ctrl.touched && ctrl.valid
+                                ? true
+                                : ctrl.touched && ctrl.invalid
+                                ? false
+                                : undefined
+                            "
+                          ></textarea>
+                        </c-col>
+                      </c-row>
+                    </p-accordionTab>
+                  </p-accordion>
+                </c-col>
+              </c-row>
+            </div>
+          </div>
+          <div class="d-flex justify-content-center mt-4">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              (click)="onCompanySubmit($event)"
+              [disabled]="companyForm.invalid"
+            >
+              Edit
+            </button>
+            <div style="width: 10px"></div>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="clearCompanyForm()"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </form>
+    </c-modal-body>
+  </c-modal>
+</div>

@@ -1,0 +1,823 @@
+<div class="desktop-view">
+  <p-toast key="toast1"></p-toast>
+  <c-modal
+    #Modal
+    alignment="center"
+    id="Modal"
+    [visible]="visible"
+    (visibleChange)="handleModalChange($event)"
+    ><c-modal-header>
+      <h4 cModalTitle>{{ isAddressEdit ? "Edit Address" : "Add Address" }}</h4>
+      <div>
+        <p-button
+          [disabled]="addressform.invalid"
+          styleClass="p-button-raised p-button-text"
+          label="{{ isAddressEdit ? 'Edit' : 'Save' }}"
+          (click)="saveAddress()"
+        >
+        </p-button>
+        <p-button
+          styleClass="p-button-raised p-button-text"
+          label="Close"
+          (click)="toggleModal()"
+        >
+        </p-button>
+      </div>
+    </c-modal-header>
+    <c-modal-body>
+      <!-- <textarea
+        [(ngModel)]="address"
+        class="textArea"
+        style="margin-top: 4px; border: none; resize: none"
+        placeholder="Enter your Address"
+        rows="2"
+        cols="60"
+        cFormControl
+        id="exampleFormControlTextarea1"
+      ></textarea> -->
+      <form [formGroup]="addressform">
+        <c-row style="padding: 0px">
+          <c-col sm="1.8" style="font-weight: 550"> Address : </c-col>
+          <c-col>
+            <input
+              style="margin-top: 5px"
+              type="text"
+              class="form-control"
+              formControlName="address"
+              placeholder="Enter the address"
+              cFormControl
+              id="productname"
+            />
+          </c-col>
+        </c-row>
+
+        <c-row style="padding: 3px">
+          <c-col sm="6" style="font-weight: 550"> Country : </c-col>
+          <c-col sm="6" style="font-weight: 550"> State : </c-col>
+        </c-row>
+
+        <c-row style="padding: 0px">
+          <c-col sm="6">
+            <p-dropdown
+              autoWidth="false"
+              [style]="{ width: '205px', 'border-radius': '5px' }"
+              [filter]="true"
+              filterBy="name"
+              placeholder="Select the country"
+              formControlName="country"
+              [options]="countries"
+              optionValue="name"
+              optionLabel="name"
+              (onChange)="onChangeCountry($event, 'country')"
+            ></p-dropdown>
+          </c-col>
+          <c-col sm="6">
+            <p-dropdown
+              autoWidth="false"
+              [style]="{ width: '210px', 'border-radius': '5px' }"
+              [filter]="true"
+              filterBy="name"
+              placeholder="Select the state"
+              formControlName="state"
+              [options]="state"
+              optionValue="name"
+              optionLabel="name"
+              (onChange)="onChangeState($event, 'state')"
+            ></p-dropdown>
+          </c-col>
+        </c-row>
+
+        <c-row style="padding: 3px">
+          <c-col sm="6" style="font-weight: 550"> City : </c-col>
+          <c-col sm="6" style="font-weight: 550"> Pin Code : </c-col>
+        </c-row>
+
+        <c-row style="padding: 0px">
+          <c-col>
+            <p-dropdown
+              autoWidth="false"
+              [style]="{ width: '205px', 'border-radius': '5px' }"
+              [filter]="true"
+              filterBy="name"
+              placeholder="Select the city"
+              formControlName="city"
+              [options]="city"
+              optionValue="name"
+              optionLabel="name"
+            ></p-dropdown>
+          </c-col>
+          <c-col>
+            <input
+              sm="6"
+              style="margin-top: 5px"
+              type="text"
+              class="form-control"
+              formControlName="pincode"
+              placeholder="Enter the pin code"
+              cFormControl
+              id="pincode"
+            />
+          </c-col>
+        </c-row>
+      </form>
+    </c-modal-body>
+  </c-modal>
+
+  <form
+    *ngIf="pagePermission.add.value"
+    [formGroup]="invoiceForm"
+    style="
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 85vh;
+    "
+    class="responsive"
+  >
+    <c-row>
+      <c-row
+        *ngIf="pagePermission.orderforcompany.value"
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-left: -1%;
+        "
+      >
+        <c-col
+          style="
+            background-color: #d8dbe0;
+            border: 1px solid rgb(202, 202, 202);
+            border-radius: 7px;
+            display: flex;
+            max-width: max-content;
+            justify-content: center;
+            align-items: center;
+            padding: 0px 0px 0px 10px;
+          "
+        >
+          <label style="font-weight: 700; margin-right: 10px"
+            >Select Company</label
+          >
+
+          <p-dropdown
+            #companyDropdown
+            autoWidth="false"
+            [style]="{ width: '252px' }"
+            [options]="companies"
+            formControlName="orderFor"
+            (onChange)="getAddressFor($event)"
+            optionLabel="companyname"
+            optionValue="companyid"
+            [showClear]="true"
+            placeholder="You are ordering for"
+          ></p-dropdown>
+        </c-col>
+      </c-row>
+
+      <c-card style="padding-left: 0; padding-right: 0">
+        <c-row style="padding-left: 0; padding-right: 0">
+          <c-col style="padding-left: 0; padding-right: 0">
+            <table bordered cTable>
+              <thead>
+                <tr>
+                  <th style="font-size: 14px; font-weight: 500" scope="col">
+                    ITEM DETAILS
+                  </th>
+                  <th style="font-size: 14px; font-weight: 500" scope="col">
+                    QUANTITY
+                  </th>
+                  <th style="font-size: 14px; font-weight: 500" scope="col">
+                    RATE
+                  </th>
+
+                  <th
+                    style="
+                      font-size: 14px;
+                      font-weight: 500;
+                      border-right: none;
+                    "
+                    scope="col"
+                  >
+                    AMOUNT<span style="font-size: x-small">(without GST)</span>
+                  </th>
+                  <th
+                    style="font-size: 14px; font-weight: 500; border-left: none"
+                    scope="col"
+                  ></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="
+                    let data of invoiceForm.get('invoiceFields')['controls'];
+                    let i = index
+                  "
+                  [@fadeOut]="'in'"
+                  [formGroup]="data"
+                >
+                  <td
+                    scope="row"
+                    style="width: 55%; border-left: none; padding-top: 12px"
+                  >
+                    <p-dropdown
+                      formControlName="item"
+                      [style]="{ width: '100%', height: '25%' }"
+                      placeholder="Select an item name"
+                      (onChange)="setPrice($event, data, i)"
+                      [options]="filteritems"
+                      [filter]="true"
+                      optionValue="id"
+                      optionLabel="productname"
+                      [showClear]="true"
+                      filterBy="productname"
+                    >
+                    </p-dropdown>
+
+                    <!-- <p-dropdown
+                      formControlName="item"
+                      [style]="{ width: '100%', height: '25%' }"
+                      placeholder="Select an item name"
+                      (onChange)="setPrice($event, data, i)"
+                      [options]="filteredSelectedItems[i]"
+                      [filter]="true"
+                      optionValue="id"
+                      optionLabel="productname"
+                      filterBy="productname"
+                    >
+                    </p-dropdown> -->
+
+                    <!-- <textarea
+                      *ngIf="
+                        data.get('item').value != '' &&
+                        data.get('item').value != undefined
+                      "
+                      formControlName="description"
+                      style="
+                        margin-top: 4px;
+                        border: none;
+                        resize: none;
+                        background-color: #fbfafa;
+                      "
+                      placeholder="Description"
+                      rows="2"
+                      cols="60"
+                      cFormControl
+                      id="exampleFormControlTextarea1"
+                    ></textarea> -->
+                  </td>
+                  <td style="width: 8%">
+                    <input
+                      [style]="{ width: '95px', padding: '5px' }"
+                      class="p-inputtext-sm"
+                      pInputText
+                      type="number"
+                      min="{{ minQuantity[i] }}"
+                      (keyup)="rateWithQuantity($event, data)"
+                      formControlName="quantity"
+                      style="border: none; margin-top: 3px; height: 7.5vh"
+                      placeholder="Quantity"
+                    />
+                  </td>
+                  <td style="width: 8%">
+                    <p-inputNumber
+                      #rate
+                      type="number"
+                      [style]="{ width: '150px' }"
+                      (keyup)="rateWithQuantity($event, data)"
+                      formControlName="rate"
+                      inputId="minmaxfraction"
+                      placeholder="Rate"
+                      mode="decimal"
+                      [min]="1"
+                      mode="currency"
+                      [minFractionDigits]="2"
+                      currencyDisplay="code"
+                      currency="INR"
+                    >
+                    </p-inputNumber>
+                  </td>
+
+                  <td style="border-right: none; width: 10%" sty>
+                    <p-inputNumber
+                      #amount
+                      type="number"
+                      [style]="{ width: '165px' }"
+                      formControlName="amount"
+                      inputId="minmaxfraction"
+                      placeholder="Amount"
+                      inputId="currency-india"
+                      mode="decimal"
+                      mode="currency"
+                      [minFractionDigits]="2"
+                      currencyDisplay="code"
+                      currency="INR"
+                    ></p-inputNumber>
+                  </td>
+                  <!-- <div
+                    style="display: flex; justify-content: end; margin: 14% 0px"
+                  >
+                    <p-button
+                      icon="pi pi-trash"
+                      styleClass="p-button-rounded p-button-danger"
+                      (click)="deleteRow(i)"
+                    ></p-button>
+                  </div> -->
+                </tr>
+              </tbody>
+              <!-- <tfoot>
+                <tr>
+                  <td colSpan="5">
+                    <p-button
+                      (click)="addRow()"
+                      icon="pi pi-plus"
+                      label="Add another line"
+                      styleClass="p-button-raised p-button-text p-button-sm"
+                    >
+                    </p-button>
+                  </td>
+                </tr>
+              </tfoot> -->
+            </table>
+          </c-col>
+        </c-row>
+      </c-card>
+    </c-row>
+    <c-row style="padding: 0">
+      <p-toolbar>
+        <div
+          style="
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <c-col style="width: 30%">
+            <p-dropdown
+              *ngIf="invoiceForm.controls['address'] as ctrl"
+              [style]="{ width: '20vw', height: '20%' }"
+              placeholder="Select the address"
+              [showClear]="true"
+              [options]="addressOptions"
+              formControlName="address"
+              [filter]="true"
+              optionLabel="full_address"
+              optionValue="id"
+            >
+              <ng-template let-option pTemplate="item">
+                <div style="display: flex; justify-content: space-between">
+                  <div style="margin-top: 5px">
+                    {{ option.address }},<br />{{ option.city }},<br />{{
+                      option.state
+                    }}, {{ option.country }},<br />{{ option.pincode }}
+                  </div>
+                  <p-button
+                    class="moveLeft"
+                    title="Edit"
+                    (click)="editAddress(option)"
+                    icon="pi pi-pencil"
+                    styleClass="p-button-rounded p-button-text p-button-raised p-button-info indexClass"
+                  ></p-button>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="footer">
+                <button
+                  type="button"
+                  (click)="toggleModal(true)"
+                  class="p-button p-button-primary dropdown-button add-address-button"
+                >
+                  <span class="plus-icon">+</span>
+                  Add Address
+                </button>
+              </ng-template>
+            </p-dropdown>
+          </c-col>
+          <!-- <c-col
+            *ngIf="invoiceForm.controls['deliveryDate'] as ctrl"
+            style="margin-left: 3%; margin-bottom: 1.5%; width: 20%"
+          >
+            <div>
+              <div
+                style="
+                  position: relative;
+                  display: block;
+                  font-size: 12px;
+                  margin-left: 8px;
+                  margin-bottom: 2px;
+                "
+              >
+                EXPECTED DELIVERY DATE
+              </div>
+
+              <input
+                class="p-inputtext-sm"
+                pInputText
+                type="date"
+                formControlName="deliveryDate"
+                style="width: 96%"
+              />
+              <div
+                style="
+                  position: absolute;
+                  display: block;
+                  font-size: 12px;
+                  margin-left: 8px;
+                  margin-bottom: 2px;
+                "
+                *ngIf="ctrl['errors']"
+              >
+                Enter a valid year
+              </div>
+            </div>
+          </c-col> -->
+          <c-col
+            style="
+              display: flex;
+              justify-content: center;
+              margin-right: 7%;
+              font-size: 20px;
+              font-weight: 700;
+              padding: 5px;
+              width: fit-content;
+              border: dotted;
+              border-width: 1px;
+            "
+          >
+            Total - {{ total | currency : "INR" }}
+          </c-col>
+          <div>
+            <p-splitButton
+              label="{{ submitButton }}"
+              (onClick)="save()"
+              icon="pi pi-check"
+              [model]="toolbarsave"
+              styleClass="p-button-warning"
+            ></p-splitButton>
+          </div>
+        </div>
+      </p-toolbar>
+    </c-row>
+  </form>
+</div>
+
+<!---------------------------------------------MOBILE VIEW--------------------------------------------->
+
+<div class="mobile-view">
+  <p-toast key="toast1"></p-toast>
+  <c-modal
+    size="lg"
+    #Modal
+    alignment="center"
+    id="Modal"
+    [visible]="visible"
+    (visibleChange)="handleModalChange($event)"
+    ><c-modal-header>
+      <h4 cModalTitle>{{ isAddressEdit ? "Edit Address" : "Add Address" }}</h4>
+      <div>
+        <p-button
+          [disabled]="address == '' || address == undefined"
+          styleClass="p-button-raised p-button-text"
+          label="{{ isAddressEdit ? 'Edit' : 'Save' }}"
+          (click)="saveAddress()"
+        >
+        </p-button>
+        <p-button
+          styleClass="p-button-raised p-button-text"
+          label="Close"
+          (click)="toggleModal()"
+        >
+        </p-button>
+      </div>
+    </c-modal-header>
+    <c-modal-body style="display: flex; justify-content: center">
+      <textarea
+        [(ngModel)]="address"
+        class="textArea"
+        style="margin-top: 4px; border: none; resize: none"
+        placeholder="Enter your address"
+        rows="2"
+        cols="60"
+        cFormControl
+        id="exampleFormControlTextarea1"
+      ></textarea>
+    </c-modal-body>
+  </c-modal>
+  <form
+    *ngIf="pagePermission.add.value"
+    [formGroup]="invoiceForm"
+    style="
+      min-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    "
+    class="responsive"
+  >
+    <c-row
+      *ngIf="pagePermission.orderforcompany.value"
+      style="display: flex; align-items: center; justify-content: space-between"
+    >
+      <c-col
+        style="
+          background-color: #ced4da45;
+          border: 1px solid rgb(202, 202, 202);
+          border-radius: 7px;
+          display: flex;
+          max-width: 100%;
+          justify-content: center;
+          align-items: center;
+        "
+      >
+        <label style="font-weight: 700; margin-right: 10px"
+          >Select Company:</label
+        >
+
+        <p-dropdown
+          #companyDropdown
+          autoWidth="false"
+          [style]="{ width: '240px' }"
+          [options]="companies"
+          formControlName="orderFor"
+          (onChange)="getAddressFor($event)"
+          optionLabel="companyname"
+          optionValue="companyid"
+          [showClear]="true"
+          placeholder="You are ordering for"
+        ></p-dropdown>
+      </c-col>
+    </c-row>
+
+    <c-card style="margin-top: -40px">
+      <c-row>
+        <c-col>
+          <div style="overflow-x: auto">
+            <table bordered cTable style="min-width: 100%">
+              <thead>
+                <tr>
+                  <th style="font-size: 14px; font-weight: 500" scope="col">
+                    ITEM DETAILS
+                  </th>
+                  <th style="font-size: 14px; font-weight: 500" scope="col">
+                    QUANTITY
+                  </th>
+                  <th style="font-size: 14px; font-weight: 500" scope="col">
+                    RATE
+                  </th>
+
+                  <th
+                    style="
+                      font-size: 14px;
+                      font-weight: 500;
+                      border-right: none;
+                    "
+                    scope="col"
+                  >
+                    AMOUNT<span style="font-size: x-small">(without GST)</span>
+                  </th>
+                  <th
+                    style="font-size: 14px; font-weight: 500; border-left: none"
+                    scope="col"
+                  ></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="
+                    let data of invoiceForm.get('invoiceFields')['controls'];
+                    let i = index
+                  "
+                  [@fadeOut]="'in'"
+                  [formGroup]="data"
+                >
+                  <td
+                    scope="row"
+                    style="width: 36.5%; border-left: none; padding-top: 12px"
+                  >
+                    <p-dropdown
+                      formControlName="item"
+                      [style]="{ width: '100%', height: '25%' }"
+                      placeholder="Select an item name"
+                      (onChange)="setPrice($event, data, i)"
+                      [options]="filteredSelectedItems[i]"
+                      [filter]="true"
+                      optionValue="id"
+                      optionLabel="productname"
+                      [showClear]="true"
+                      filterBy="productname"
+                      [appendTo]="'body'"
+                    >
+                    </p-dropdown>
+
+                    <!-- <textarea
+                      *ngIf="
+                        data.get('item').value != '' &&
+                        data.get('item').value != undefined
+                      "
+                      formControlName="description"
+                      style="
+                        margin-top: 4px;
+                        border: none;
+                        resize: none;
+                        background-color: #fbfafa;
+                      "
+                      placeholder="Description"
+                      rows="2"
+                      cols="60"
+                      cFormControl
+                      id="exampleFormControlTextarea1"
+                    ></textarea> -->
+                  </td>
+                  <td style="width: 10%">
+                    <input
+                      style="padding: 5px"
+                      class="p-inputtext-sm"
+                      pInputText
+                      type="number"
+                      min="{{ minQuantity[i] }}"
+                      (keyup)="rateWithQuantity($event, data)"
+                      formControlName="quantity"
+                      style="border: none; margin-top: 3px; height: 7.5vh"
+                      placeholder="Quantity"
+                    />
+                  </td>
+                  <td>
+                    <p-inputNumber
+                      type="number"
+                      (keyup)="rateWithQuantity($event, data)"
+                      formControlName="rate"
+                      inputId="minmaxfraction"
+                      placeholder="Quantity"
+                      inputId="currency-india"
+                      mode="decimal"
+                      mode="currency"
+                      [minFractionDigits]="2"
+                      currencyDisplay="code"
+                      currency="INR"
+                    >
+                    </p-inputNumber>
+                  </td>
+
+                  <td style="border-right: none">
+                    <p-inputNumber
+                      type="number"
+                      formControlName="amount"
+                      inputId="minmaxfraction"
+                      placeholder="Quantity"
+                      inputId="currency-india"
+                      mode="decimal"
+                      mode="currency"
+                      [minFractionDigits]="2"
+                      currencyDisplay="code"
+                      currency="INR"
+                      class="disabled-input"
+                    ></p-inputNumber>
+                  </td>
+                  <!-- <div
+                    style="display: flex; justify-content: end; margin: 14% 0px"
+                  >
+                    <p-button
+                      icon="pi pi-trash"
+                      styleClass="p-button-rounded p-button-danger"
+                      (click)="deleteRow(i)"
+                    ></p-button>
+                  </div> -->
+                </tr>
+              </tbody>
+              <!-- <tfoot>
+                <tr>
+                  <td colSpan="5">
+                    <p-button
+                      (click)="addRow()"
+                      icon="pi pi-plus"
+                      label="Add another line"
+                      styleClass="p-button-raised p-button-text p-button-sm"
+                    >
+                    </p-button>
+                  </td>
+                </tr>
+              </tfoot> -->
+            </table>
+          </div>
+        </c-col>
+      </c-row>
+    </c-card>
+
+    <c-card
+      style="
+        width: 90%;
+        margin-top: 10px;
+        margin-left: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <c-row>
+        <c-col style="width: 48%; margin-top: 18px; padding-right: 70%">
+          <p-dropdown
+            *ngIf="invoiceForm.controls['address'] as ctrl"
+            [style]="{ width: '170%', height: '25%' }"
+            placeholder="Select the address"
+            [showClear]="true"
+            [options]="addressOptions"
+            formControlName="address"
+            [filter]="true"
+            optionValue="id"
+            optionLabel="address"
+            filterBy="address"
+          >
+            <ng-template let-option pTemplate="item">
+              <div style="display: flex; justify-content: space-between">
+                <div style="margin-top: 5px">
+                  {{ option.address }}
+                </div>
+                <p-button
+                  class="moveLeft"
+                  title="Edit"
+                  (click)="editAddress(option)"
+                  icon="pi pi-pencil"
+                  styleClass="p-button-rounded p-button-text p-button-raised p-button-info indexClass"
+                ></p-button>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <button
+                type="button"
+                (click)="toggleModal(true)"
+                class="p-button p-button-primary dropdown-button add-address-button"
+              >
+                <span class="plus-icon">+</span>
+                Add Address
+              </button>
+            </ng-template>
+          </p-dropdown>
+        </c-col>
+
+        <!-- <c-col
+          *ngIf="invoiceForm.controls['deliveryDate'] as ctrl"
+          style="width: 48%"
+        >
+          <div style="margin-left: 8px">
+            <div
+              style="
+                position: relative;
+                display: block;
+                font-size: 12px;
+                margin-bottom: 2px;
+              "
+            >
+              Expected Delivery Date
+            </div>
+
+            <input
+              class="p-inputtext-sm"
+              pInputText
+              type="date"
+              formControlName="deliveryDate"
+              style="width: 100%"
+            />
+            <div
+              style="
+                position: absolute;
+                display: block;
+                font-size: 12px;
+                margin-left: 8px;
+                margin-bottom: 2px;
+              "
+              *ngIf="ctrl['errors']"
+            >
+              Enter a valid year
+            </div>
+          </div>
+        </c-col> -->
+      </c-row>
+
+      <c-row style="width: 100%; display: flex; justify-content: center">
+        <c-col
+          style="
+            font-size: 20px;
+            font-weight: 700;
+            padding: 5px;
+            border: dotted;
+            border-width: 1px;
+          "
+        >
+          Total - {{ total | currency : "INR" }}
+        </c-col>
+      </c-row>
+
+      <c-row style="width: 100%; display: flex; justify-items: center">
+        <c-col>
+          <p-splitButton
+            label="{{ submitButton }}"
+            (onClick)="save()"
+            icon="pi pi-check"
+            [model]="toolbarsave"
+            styleClass="p-button-warning"
+          ></p-splitButton>
+        </c-col> </c-row
+    ></c-card>
+  </form>
+</div>

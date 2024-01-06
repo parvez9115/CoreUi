@@ -1,0 +1,163 @@
+<button cButton class="floatingButton" title="Export" (click)="export()">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 1px"
+  ></i>
+</button>
+<button
+  cButton
+  title="Import"
+  class="floatingButton"
+  (click)="downloadExcel()"
+  style="top: 73vh; background-color: rgb(211, 211, 0)"
+>
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 1px"
+  ></i>
+</button>
+<div [visible]="visible" cCollapse>
+  <p-toast key="toast1"></p-toast>
+  <c-card class="mt-3 shadow">
+    <c-card-body>
+      <form [formGroup]="accountsMapping">
+        <c-row class="align-items-start">
+          <c-col sm="6" style="margin-bottom: 5px">
+            <p-dropdown
+              autoWidth="false"
+              [style]="{ width: '100%' }"
+              [options]="provider"
+              optionValue="name"
+              optionLabel="name"
+              (onChange)="getPlan()"
+              [filter]="true"
+              filterBy="name"
+              formControlName="simprovider"
+              [showClear]="true"
+              placeholder="Select the sim provider "
+            >
+              <ng-template let-provider pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                  <div>{{ provider.name }}</div>
+                </div>
+              </ng-template>
+            </p-dropdown>
+          </c-col>
+          <c-col sm="6">
+            <p-dropdown
+              autoWidth="false"
+              [style]="{ width: '100%' }"
+              [options]="plan"
+              optionValue="name"
+              optionLabel="name"
+              [filter]="true"
+              filterBy="name"
+              formControlName="planname"
+              [showClear]="true"
+              placeholder="Select the plan name "
+            >
+              <ng-template let-plan pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                  <div>{{ plan.name }}</div>
+                </div>
+              </ng-template>
+            </p-dropdown>
+          </c-col>
+        </c-row>
+
+        <c-row style="margin-top: 20px">
+          <c-col sm="6">
+            <c-input-group class="mb-3" sizing="sm">
+              <span cInputGroupText id="basic-addon1">Account No</span>
+              <input
+                aria-describedby="basic-addon1"
+                aria-label="Username"
+                formControlName="accountno"
+                cFormControl
+                placeholder="Enter the account no"
+              />
+            </c-input-group>
+          </c-col>
+          <c-col sm="6">
+            <c-input-group class="mb-3" sizing="sm">
+              <input
+                cFormControl
+                (change)="onFileChange($event)"
+                formControlName="fileupload"
+                id="inputGroupFile01"
+                type="file"
+              />
+            </c-input-group>
+          </c-col>
+        </c-row>
+      </form>
+      <div style="display: flex; justify-content: center">
+        <div>
+          <button
+            style="margin-right: 10px"
+            size="sm"
+            cButton
+            color="primary"
+            (click)="save()"
+            [disabled]="!accountsMapping.valid"
+            variant="outline"
+          >
+            Submit
+          </button>
+        </div>
+        <div>
+          <button
+            size="sm"
+            style="margin-left: 10px"
+            cButton
+            (click)="clear()"
+            color="dark"
+            variant="outline"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    </c-card-body>
+  </c-card>
+</div>
+
+<c-row style="justify-content: end; margin: 10px 0px">
+  <button
+    (click)="toggleCollapse()"
+    size="sm"
+    cButton
+    color="primary"
+    *ngIf="pagePermission?.add?.value"
+  >
+    <svg cIcon name="{{ visible ? 'cilArrowTop' : 'cilArrowBottom' }}"></svg>
+    {{ visible ? "Close" : "Open" }}
+  </button>
+</c-row>
+
+<c-card *ngIf="pagePermission?.view?.value == true" class="mb-4">
+  <ag-grid-angular
+    #myGrid
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowData]="rowData"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    (gridReady)="onGridReady()"
+    rowAnimation
+    [pagination]="true"
+    enableCellTextSelection
+    [paginationPageSize]="selectedRowSize"
+  >
+  </ag-grid-angular>
+  <div
+    class="card flex justify-content-center"
+    style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+  >
+    <p-dropdown
+      [(ngModel)]="selectedRowSize"
+      [style]="{ width: '100%', 'max-height': '35px' }"
+      [options]="[100, 200, 500, 1000]"
+    ></p-dropdown>
+  </div>
+</c-card>

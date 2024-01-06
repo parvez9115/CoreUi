@@ -1,0 +1,319 @@
+<button cButton class="floatingButton" (click)="export()" title="Export">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 1px"
+  ></i>
+</button>
+<div [visible]="true" cCollapse *ngIf="pagePermission?.viewiccid?.value">
+  <p-toast key="toast1"></p-toast>
+  <c-card class="mt-3 shadow">
+    <c-card-body>
+      <div class="align-items-start" class="input-Container">
+        <div style="width: 32%">
+          <c-input-group class="mb-3" style="width: 100%" sizing="sm">
+            <span cInputGroupText id="basic-addon1">Enter the ICCID No </span>
+            <input
+              aria-describedby="basic-addon1"
+              aria-label="Username"
+              cFormControl
+              [(ngModel)]="iccidFinder"
+              placeholder="Enter the primary ICCID no"
+            />
+          </c-input-group>
+        </div>
+        <div>
+          <button
+            size="sm"
+            style="margin-left: 14px"
+            cButton
+            color="success"
+            variant="outline"
+            (click)="search()"
+          >
+            Show
+          </button>
+          <button
+            size="sm"
+            style="margin-left: 10px"
+            cButton
+            (click)="clearIccid()"
+            color="dark"
+            variant="outline"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    </c-card-body>
+  </c-card>
+</div>
+
+<c-card *ngIf="pagePermission?.view?.value == true" class="mb-4">
+  <ag-grid-angular
+    #myGrid
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [pagination]="true"
+    [rowData]="rowData"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    (gridReady)="onGridReady()"
+    rowAnimation
+    enableCellTextSelection
+    [paginationPageSize]="selectedRowSize"
+  >
+  </ag-grid-angular>
+  <div
+    class="card flex justify-content-center"
+    style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+  >
+    <p-dropdown
+      [(ngModel)]="selectedRowSize"
+      [style]="{ width: '100%', 'max-height': '35px' }"
+      [options]="[100, 200, 500, 1000]"
+    ></p-dropdown>
+  </div>
+</c-card>
+<c-modal
+  size="sm"
+  [visible]="endisYear"
+  #verticallyCenteredModal
+  alignment="center"
+  id="verticallyCenteredModal"
+  (visibleChange)="handleYear($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Topup Status Update</h5>
+    <button (click)="toggleYear()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body
+    style="display: flex; justify-content: space-around; align-items: center"
+  >
+    <c-row>
+      <div>
+        <p-dropdown
+          [options]="months"
+          [(ngModel)]="selectedMonth"
+          optionLabel="name"
+          [filter]="true"
+          filterBy="name"
+          (onClear)="clearPlan()"
+          [showClear]="true"
+          placeholder="Select the Plan "
+        >
+          <ng-template let-months pTemplate="item">
+            <div class="flex align-items-center gap-2">
+              <div>{{ months.name }}</div>
+            </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
+    </c-row>
+
+    <button
+      [disabled]="selectedMonth == ''"
+      (click)="savePlans()"
+      style="margin-left: 5px"
+      cButton
+      color="primary"
+    >
+      Submit
+    </button>
+  </c-modal-body>
+</c-modal>
+<c-modal
+  [visible]="liveDemoVisible"
+  #verticallyCenteredModal
+  alignment="center"
+  id="verticallyCenteredModal"
+  (visibleChange)="handleLiveDemoChange($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>ICCID Details</h5>
+    <button (click)="toggleLiveDemo()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">ICCID</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ value?.resultObj[0].cardState }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Card State</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ value?.resultObj[0].cardStatus }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Card Status</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ value?.resultObj[0].cardStatus }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Activate On</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ value?.resultObj[0].activateOn }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Expired On</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ value?.resultObj[0].expiredOn }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Data Usage</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ value?.resultObj[0].dataUsage }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Data Usage Date</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ value?.resultObj[0].dataUsageDate }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Primary TSP</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ value?.resultObj[0].primaryTSP }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Primary MSISN</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ value?.resultObj[0].primaryMSISDN }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Primary Status</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ value?.resultObj[0].primaryStatus }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Fallback TSP</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ value?.resultObj[0].fallbackTSP }}
+      </li>
+    </ul>
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Fallback MSISDN</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ value?.resultObj[0].fallbackMSISDN }}
+      </li>
+    </ul>
+
+    <ul [horizontal]="''" cListGroup class="keyValueList">
+      <li cListGroupItem [color]="'success'">Fallback Status</li>
+      <li cListGroupItem [color]="'warning'">
+        {{ value?.resultObj[0].fallbackStatus }}
+      </li>
+    </ul>
+
+    <!-- <c-row>
+      <c-col size="12">
+        <c-row>
+        
+          <c-col size="12" class="ImeiStyle">
+            <span class="span_style">ICCID:</span>
+          
+          </c-col>
+        </c-row>
+        <c-row>
+          <c-col size="12" class="ImeiStyle">
+            <span class="span_style">Card State:</span>
+            {{ value?.resultObj[0].cardState }}
+          </c-col>
+        </c-row>
+        <c-row>
+          <c-col size="12" class="ImeiStyle">
+            <span class="span_style">Card Status:</span>
+            {{ value?.resultObj[0].cardStatus }}
+          </c-col>
+        </c-row>
+        <c-row>
+          <c-col size="12" class="ImeiStyle">
+            <span class="span_style">Activate On:</span>
+            {{ value?.resultObj[0].activateOn }}
+          </c-col>
+        </c-row>
+        <c-row>
+          <c-col size="12" class="ImeiStyle">
+            <span class="span_style">Expired On:</span>
+            {{ value?.resultObj[0].expiredOn }}
+          </c-col>
+        </c-row>
+        <c-row>
+          <c-col size="12" class="ImeiStyle">
+            <span class="span_style">Data Usage:</span>
+            {{ value?.resultObj[0].dataUsage }}
+          </c-col>
+        </c-row>
+        <c-row>
+          <c-col size="12" class="ImeiStyle">
+            <span class="span_style">Data Usage Date:</span>
+            {{ value?.resultObj[0].dataUsageDate }}
+          </c-col>
+        </c-row>
+        <c-row>
+          <c-col size="12" class="ImeiStyle">
+            <span class="span_style">Primary TSP:</span>
+            {{ value?.resultObj[0].primaryTSP }}
+          </c-col>
+        </c-row>
+        <c-row>
+          <c-col size="12" class="ImeiStyle">
+            <span class="span_style">Primary MSISN:</span>
+            {{ value?.resultObj[0].primaryMSISDN }}
+          </c-col>
+        </c-row>
+        <c-row>
+          <c-col size="12" class="ImeiStyle">
+            <span class="span_style">Primary Status:</span>
+            {{ value?.resultObj[0].primaryStatus }}
+          </c-col>
+        </c-row>
+        <c-row>
+          <c-col size="12" class="ImeiStyle">
+            <span class="span_style">Fallback TSP:</span>
+            {{ value?.resultObj[0].fallbackTSP }}
+          </c-col>
+        </c-row>
+        <c-row>
+          <c-col size="12" class="ImeiStyle">
+            <span class="span_style">Fallback MSISDN:</span>
+            {{ value?.resultObj[0].fallbackMSISDN }}
+          </c-col>
+        </c-row>
+        <c-row>
+          <c-col size="12" class="ImeiStyle">
+            <span class="span_style">Fallback Status:</span>
+            {{ value?.resultObj[0].fallbackStatus }}
+          </c-col>
+        </c-row>
+      </c-col>
+    </c-row> -->
+  </c-modal-body>
+</c-modal>
+
+<c-modal
+  [visible]="endisConfirm"
+  #verticallyCenteredModal
+  alignment="center"
+  (visibleChange)="handleYear($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Confirm</h5>
+    <button (click)="toggleConfirm()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>Are you sure you want to Extend 1 Year ?</c-modal-body>
+  <c-modal-footer>
+    <button (click)="toggleConfirm()" cButton color="secondary">Close</button>
+    <button (click)="saveOneYear()" cButton color="primary">
+      Save changes
+    </button>
+  </c-modal-footer>
+</c-modal>

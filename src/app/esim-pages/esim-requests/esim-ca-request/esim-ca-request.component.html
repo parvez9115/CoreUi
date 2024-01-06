@@ -1,0 +1,628 @@
+<p-toast key="toast1"></p-toast>
+<button cButton class="floatingButton" title="Export" (click)="export()">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 2px"
+  ></i>
+</button>
+<div class="card" style="margin-bottom: 10px">
+  <p-tabMenu
+    #tabMenu
+    class="caTabs"
+    [scrollable]="true"
+    [model]="tabs"
+    [activeItem]="activeTab"
+    (activeItemChange)="tabChanged($event)"
+  ></p-tabMenu>
+</div>
+<c-row style="margin-bottom: 10px; justify-content: end">
+  <c-col
+    style="display: grid; padding-bottom: 5px"
+    xs="12"
+    md="3"
+    *ngIf="!isActivatedTab && pagePermissions.statusupdate.value"
+  >
+    <button
+      (click)="toggleActivationModal()"
+      cButton
+      class="custom-button"
+      #activateProduct
+    >
+      Activate Product
+    </button>
+  </c-col>
+
+  <!-- <c-col
+    style="display: grid; padding-bottom: 5px"
+    xs="12"
+    md="3"
+    *ngIf="isActivatedTab"
+  >
+    <button
+      (click)="toggleBsnlCertificateModal()"
+      cButton
+      class="custom-button"
+    >
+      Request for BSNL Certificate
+    </button>
+  </c-col> -->
+
+  <c-col
+    style="display: grid; padding-bottom: 5px"
+    xs="12"
+    md="3"
+    *ngIf="isActivatedTab && pagePermissions.extendvalidityrequest.value"
+  >
+    <button (click)="toggleExtendValidityModal()" cButton class="custom-button">
+      Request for Extend 1 Year
+    </button>
+  </c-col>
+  <c-col
+    style="display: grid; padding-bottom: 5px"
+    xs="12"
+    md="3"
+    *ngIf="isActivatedTab && pagePermissions.topuprequest.value"
+  >
+    <button (click)="toggleTopupModal()" cButton class="custom-button">
+      Request for Topup
+    </button>
+  </c-col>
+  <c-col
+    style="display: grid; padding-bottom: 5px"
+    xs="12"
+    md="3"
+    *ngIf="isActivatedTab && pagePermissions.renewalrequest.value"
+  >
+    <button
+      (click)="toggleRenewalModal()"
+      cButton
+      class="custom-button"
+      #renewProduct
+    >
+      Request for Renewal
+    </button>
+  </c-col>
+</c-row>
+
+<c-card class="mb-4">
+  <div style="display: flex; justify-content: flex-end">
+    <span class="p-input-icon-left" style="width: 40%; margin: 5px">
+      <i class="pi pi-search"></i>
+      <input
+        type="text"
+        pInputText
+        (change)="gridPagination.checkSearch($event)"
+        (keyup.enter)="handlePagination('first')"
+        [(ngModel)]="gridPagination.searchTerm"
+        style="width: 100%"
+        placeholder="Search grid"
+      />
+      <i
+        class="pi pi-times"
+        style="right: 4%;cursor: pointer;"
+        (click)="
+          gridPagination.searchTerm = '';
+          gridPagination.isSearched?handlePagination('first'):null;
+          gridPagination.isSearched=false;
+        "
+      ></i>
+    </span>
+    <button
+      style="margin: 5px"
+      type="submit"
+      class="btn btn-primary"
+      (click)="handlePagination('first')"
+      [disabled]="
+        gridPagination.searchTerm == undefined ||
+        gridPagination.searchTerm == ''
+      "
+    >
+      Search
+    </button>
+  </div>
+  <ag-grid-angular
+    #CAGrid
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowSelection]="'multiple'"
+    [rowData]="rowData"
+    [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+    [rowMultiSelectWithClick]="true"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    (gridReady)="onGridReady($event)"
+    rowAnimation
+    enableCellTextSelection
+  >
+  </ag-grid-angular>
+  <div class="paginationContainer">
+    <span class="paginationText">{{
+      gridPagination.totalRecords!=0? gridPagination.currentPage * 100 + 1:0
+    }}</span>
+    to <span class="paginationText">{{ gridPagination.toRecord }}</span> of
+    <span class="paginationText">{{ gridPagination.totalRecords }}</span>
+    <div style="display: flex; align-items: center">
+      <i
+        class="pi pi-fast-backward paginationIcon"
+        (click)="handlePagination('first')"
+      ></i>
+      <i
+        class="pi pi-caret-left paginationIcon"
+        (click)="handlePagination('previous')"
+      ></i>
+      Page
+      <span class="paginationText">{{ gridPagination.currentPage + 1 }}</span>
+      of {{ gridPagination.totalPages + 1 }}
+      <i
+        class="pi pi-caret-right paginationIcon"
+        (click)="handlePagination('next')"
+      ></i>
+      <i
+        class="pi pi-fast-forward paginationIcon"
+        (click)="handlePagination('last')"
+      ></i>
+    </div>
+  </div>
+</c-card>
+
+<c-modal
+  id="activateModal"
+  #renewalModal
+  size="lg"
+  alignment="center"
+  *ngIf="renewalModalLoader"
+  [visible]="renewalModalToggle"
+  (visibleChange)="handleRenewalModalChange($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Select Plan For Renewal Request</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <ag-grid-angular
+      #selectedRowsGrid
+      style="height: 300px"
+      class="ag-theme-alpine"
+      [rowData]="selectedRows"
+      [columnDefs]="selectedRowColumnDefs"
+      [defaultColDef]="defaultColDef"
+    >
+    </ag-grid-angular>
+    <label
+      for="address"
+      style="margin-bottom: 5px; margin-top: 10px; font-weight: bold"
+      >Activation Plan :</label
+    >
+    <p-dropdown
+      autoWidth="false"
+      [style]="{ width: '100%' }"
+      [options]="plans"
+      optionValue="planValue"
+      optionLabel="years"
+      [(ngModel)]="plan"
+      [showClear]="true"
+      placeholder="Select a plan"
+    ></p-dropdown>
+  </c-modal-body>
+  <c-modal-footer>
+    <button
+      cButton
+      color="primary"
+      (click)="requestForRenewal('Renewal')"
+      disabled="{{ plan == undefined || plan == '' }}"
+    >
+      Request Renewal
+    </button>
+    <button (click)="toggleRenewalModal()" cButton color="secondary">
+      Close
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<c-modal
+  id="topupModal"
+  #topupModal
+  size="lg"
+  alignment="center"
+  *ngIf="topupModalLoader"
+  [visible]="topupModalToggle"
+  (visibleChange)="handleTopupModalChange($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Select Plan For Topup Request</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <ag-grid-angular
+      #selectedRowsGrid
+      style="height: 300px"
+      class="ag-theme-alpine"
+      [rowData]="selectedRows"
+      [columnDefs]="selectedRowColumnDefs"
+      [defaultColDef]="defaultColDef"
+    >
+    </ag-grid-angular>
+    <label
+      for="address"
+      style="margin-bottom: 5px; margin-top: 10px; font-weight: bold"
+      >Activation Plan :</label
+    >
+    <p-dropdown
+      autoWidth="false"
+      [style]="{ width: '100%' }"
+      [options]="Topupplans"
+      optionValue="planValue"
+      optionLabel="years"
+      [(ngModel)]="plan"
+      [showClear]="true"
+      placeholder="Select a plan"
+    ></p-dropdown>
+  </c-modal-body>
+  <c-modal-footer>
+    <button
+      cButton
+      color="primary"
+      (click)="requestForTopup('TopUp')"
+      disabled="{{ plan == undefined || plan == '' }}"
+    >
+      Request Topup
+    </button>
+    <button (click)="toggleTopupModal()" cButton color="secondary">
+      Close
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<c-modal
+  id="extendModal"
+  #extendValidityModal
+  size="lg"
+  alignment="center"
+  *ngIf="extendValidityModalLoader"
+  [visible]="extendValidityModalToggle"
+  (visibleChange)="handleExtendValidityModalChange($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Select Plan For Extend 1 Year Request</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <ag-grid-angular
+      #selectedRowsGrid
+      style="height: 300px"
+      class="ag-theme-alpine"
+      [rowData]="selectedRows"
+      [columnDefs]="selectedRowColumnDefs"
+      [defaultColDef]="defaultColDef"
+    >
+    </ag-grid-angular>
+    <label
+      for="address"
+      style="margin-bottom: 5px; margin-top: 10px; font-weight: bold"
+      >Activation Plan :</label
+    >
+    <input
+      class="form-control"
+      style="margin-top: 5px"
+      cFormControl
+      value="1 Year"
+      disabled
+    />
+  </c-modal-body>
+  <c-modal-footer>
+    <button
+      cButton
+      color="primary"
+      (click)="requestForExtendValidity('extend')"
+    >
+      Request Extend 1 Year
+    </button>
+    <button (click)="toggleExtendValidityModal()" cButton color="secondary">
+      Close
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<!-- <c-modal
+  id="extendModal"
+  #extendValidityModal
+  size="lg"
+  alignment="center"
+  [visible]="bsnlCertificateModalToggle"
+  (visibleChange)="handleBsnlCertificateModalChange($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Select Plan For BSNL Certificate Request</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <ag-grid-angular
+      #selectedRowsGrid
+      style="height: 300px"
+      class="ag-theme-alpine"
+      [rowData]="selectedRows"
+      [columnDefs]="selectedRowColumnDefs"
+      [defaultColDef]="defaultColDef"
+    >
+    </ag-grid-angular>
+    <label
+      for="address"
+      style="margin-bottom: 5px; margin-top: 10px; font-weight: bold"
+      >Activation Plan:</label
+    >
+    <p-dropdown
+      autoWidth="false"
+      [style]="{ width: '100%' }"
+      [options]="plans"
+      optionValue="planValue"
+      optionLabel="years"
+      [(ngModel)]="plan"
+      [showClear]="true"
+      placeholder="Select a Plan"
+    ></p-dropdown>
+  </c-modal-body>
+  <c-modal-footer>
+    <button
+      cButton
+      color="primary"
+      (click)="requestForBsnlCertficate('Bsnl')"
+      disabled="{{ plan == undefined || plan == '' }}"
+    >
+      Submit
+    </button>
+    <button (click)="toggleBsnlCertificateModal()" cButton color="secondary">
+      Close
+    </button>
+  </c-modal-footer>
+</c-modal> -->
+
+<!-- On Going Process of Extend Invoice-->
+
+<!-- <c-modal
+  size="xl"
+  alignment="center"
+  [visible]="generateInvoiceModalToggle"
+  (visibleChange)="generateInvoiceModalToggleChange($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Invoice Details</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <c-row>
+      <c-col xs="12" md="4">
+        <label
+          ><span class="dealer-label">Company :</span> {{ dealer }}</label
+        ></c-col
+      >
+      <c-col xs="12" md="4"
+        ><label
+          ><span class="dealer-label">Invoice Date :</span> {{ date }}</label
+        ></c-col
+      >
+    </c-row>
+
+    <c-row *ngIf="visible" style="margin-top: 10px">
+      <c-col xs="12" md="4">
+        <label
+          ><span class="dealer-label">Primary ICCID : </span
+          >{{ selectedimei }}</label
+        ></c-col
+      >
+      <c-col xs="12" md="5">
+        <p-dropdown
+          autoWidth="false"
+          [style]="{ width: '100%' }"
+          [options]="editfilter"
+          optionValue="productname"
+          optionLabel="productname"
+          [(ngModel)]="selctedproductname"
+          [showClear]="true"
+        ></p-dropdown>
+      </c-col>
+      <c-col>
+        <button cButton color="primary" (click)="save()">Save</button>
+        <button
+          style="margin-left: 3px"
+          cButton
+          color="secondary"
+          (click)="dismiss()"
+        >
+          Cancel
+        </button>
+      </c-col>
+    </c-row>
+
+    <ag-grid-angular
+      #selectedRowsGrid
+      style="height: 300px; margin-top: 10px"
+      class="ag-theme-alpine"
+      [rowData]="invoicedata"
+      [columnDefs]="invoicegrid"
+    >
+    </ag-grid-angular>
+
+    <c-modal-footer>
+      <button cButton color="primary" (click)="GenerateInvoice(whichinvoice)">
+        Submit
+      </button>
+      <button cButton color="secondary" (click)="toggleGenearteInvoiceModal()">
+        Close
+      </button>
+    </c-modal-footer>
+  </c-modal-body>
+</c-modal> -->
+
+<c-modal [visible]="endisConfirm" #verticallyCenteredModal alignment="center">
+  <c-modal-header>
+    <h5 cModalTitle>Confirm</h5>
+    <button (click)="toggleConfirm()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>Are you sure you want to delete ?</c-modal-body>
+  <c-modal-footer>
+    <button (click)="delete()" cButton color="primary">Yes</button>
+    <button (click)="toggleConfirm()" cButton color="secondary">No</button>
+  </c-modal-footer>
+</c-modal>
+
+<!-- On Going Process of Extend Invoice-->
+
+<c-modal
+  size="xl"
+  alignment="center"
+  *ngIf="generateInvoiceModalLoader"
+  [visible]="generateInvoiceModalToggle"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Invoice Details</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <c-row>
+      <c-col xs="12" md="4">
+        <label
+          ><span class="dealer-label">Company :</span> {{ dealer }}</label
+        ></c-col
+      >
+      <c-col xs="12" md="4"
+        ><label
+          ><span class="dealer-label">Invoice Date :</span> {{ date }}</label
+        ></c-col
+      >
+    </c-row>
+
+    <c-row *ngIf="visible" style="margin-top: 10px">
+      <c-col xs="12" md="4">
+        <label
+          ><span class="dealer-label">Primary ICCID : </span
+          >{{ selectedimei }}</label
+        ></c-col
+      >
+      <c-col xs="12" md="5">
+        <p-dropdown
+          autoWidth="false"
+          [style]="{ width: '100%' }"
+          [options]="editfilter"
+          optionValue="productname"
+          optionLabel="productname"
+          [(ngModel)]="selctedproductname"
+          [showClear]="true"
+        ></p-dropdown>
+      </c-col>
+      <c-col>
+        <button cButton color="primary" (click)="save()">Save</button>
+        <button
+          style="margin-left: 3px"
+          cButton
+          color="secondary"
+          (click)="dismiss()"
+        >
+          Cancel
+        </button>
+      </c-col>
+    </c-row>
+
+    <ag-grid-angular
+      #selectedRowsGrid
+      style="height: 300px; margin-top: 10px"
+      class="ag-theme-alpine"
+      [rowData]="invoicedata"
+      [columnDefs]="invoicegrid"
+    >
+    </ag-grid-angular>
+
+    <c-modal-footer>
+      <button cButton color="primary" (click)="GenerateInvoice(whichinvoice)">
+        Submit
+      </button>
+      <button cButton color="secondary" (click)="toggleGenearteInvoiceModal()">
+        Close
+      </button>
+    </c-modal-footer>
+  </c-modal-body>
+</c-modal>
+
+<c-modal [visible]="endisConfirm" #verticallyCenteredModal alignment="center">
+  <c-modal-header>
+    <h5 cModalTitle>Confirm</h5>
+    <button (click)="toggleConfirm()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>Are you sure you want to delete ?</c-modal-body>
+  <c-modal-footer>
+    <button (click)="delete()" cButton color="primary">Yes</button>
+    <button (click)="toggleConfirm()" cButton color="secondary">No</button>
+  </c-modal-footer>
+</c-modal>
+
+<c-modal
+  id="topupModal"
+  #activationModal
+  size="lg"
+  alignment="center"
+  *ngIf="activationModalLoader"
+  [visible]="activationModalToggle"
+  (visibleChange)="handleActivationModalChange($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Activate Product</h5>
+  </c-modal-header>
+
+  <c-modal-body>
+    <ag-grid-angular
+      #selectedRowsGrid
+      style="height: 300px"
+      class="ag-theme-alpine"
+      [rowData]="selectedRows"
+      [columnDefs]="selectedRowColumnDefs"
+      [defaultColDef]="defaultColDef"
+    >
+    </ag-grid-angular>
+
+    <c-input-group style="width: 69%; margin-top: 20px">
+      <span cInputGroupText style="font-weight: bold">Card Active Date :</span>
+
+      <input
+        cFormControl
+        [(ngModel)]="date"
+        [min]="minDate"
+        [max]="maxDate"
+        [ngModelOptions]="{ standalone: true }"
+        type="date"
+        class="date-input"
+        disabled
+      />
+    </c-input-group>
+
+    <form [formGroup]="activationForm">
+      <c-row>
+        <c-col>
+          <label
+            style="margin-bottom: 5px; margin-top: 10px; font-weight: bold"
+            for="companydisplayname"
+          >
+            Comment :</label
+          >
+          <input
+            cFormControl
+            formControlName="comment"
+            type="text"
+            class="form-control"
+            id="companydisplayname"
+            placeholder="Enter comments if any"
+          />
+        </c-col>
+      </c-row>
+    </form>
+  </c-modal-body>
+  <c-modal-footer>
+    <button
+      cButton
+      color="primary"
+      (click)="CommercialActivation()"
+      disabled="{{ activationForm.invalid }}"
+    >
+      Submit
+    </button>
+    <button (click)="toggleActivationModal()" cButton color="secondary">
+      Close
+    </button>
+  </c-modal-footer>
+</c-modal>

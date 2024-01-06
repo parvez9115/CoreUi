@@ -1,0 +1,1233 @@
+<p-toast key="toast1"></p-toast>
+
+<button cButton class="floatingButton" (click)="export()" title="Export">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 1px"
+  ></i>
+</button>
+<div class="card" style="margin-bottom: 10px">
+  <p-tabMenu
+    #tabMenu
+    class="caTabs"
+    [scrollable]="true"
+    [model]="tabs"
+    [activeItem]="activeTab"
+    (activeItemChange)="tabChanged($event)"
+  ></p-tabMenu>
+</div>
+<c-modal
+  #modalXl
+  id="modalXl"
+  size="xl"
+  *ngIf="visiblePrintLoader"
+  [visible]="visiblePrint"
+  (visibleChange)="handlevisiblePrint($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>Purchase Order</h4>
+    <div>
+      <p-button (click)="print()" styleClass="p-button-raised p-button-text">
+        <svg cIcon name="cil-print" size="xl" title="Print"></svg>
+      </p-button>
+      <p-button (click)="download()" styleClass="p-button-raised p-button-text">
+        <svg
+          cIcon
+          name="cil-data-transfer-down"
+          size="xl"
+          title="download"
+        ></svg>
+      </p-button>
+      <p-button
+        (click)="visiblePrint = false"
+        label="Close"
+        styleClass="p-button-raised p-button-text"
+      ></p-button>
+    </div>
+  </c-modal-header>
+  <c-modal-body>
+    <div id="one" #one>
+      <!--The below style_start tag has to be present as it is used to substring the style content from the body html-->
+      <!--style_start-->
+
+      <!--style_end-->
+      <div class="pcs-template">
+        <div
+          id="header"
+          class="pcs-template-header pcs-header-content"
+          style="position: running(header); top: 0"
+        >
+          <div class="pcs-template-fill-emptydiv"></div>
+        </div>
+        <div
+          id="header_otherpages"
+          class="pcs-template-header"
+          style="position: running(header_otherpages); top: 0"
+        >
+          <div class="pcs-template-fill-emptydiv"></div>
+        </div>
+        <div
+          class="pcs-template-footer"
+          style="right: 0; bottom: 0; position: running(footer)"
+        >
+          <div class="pcs-footer-content">
+            <div class="pcs-template-fill-emptydiv"></div>
+            <div style="float: right; padding: 10px 0 20px; text-align: right">
+              <span
+                style="
+                  display: table-cell;
+                  vertical-align: middle;
+                  padding-right: 5px;
+                "
+                id="pageNumber"
+              ></span>
+            </div>
+            <div style="clear: both"></div>
+          </div>
+        </div>
+        <div class="pcs-template-body">
+          <table style="width: 100%; table-layout: fixed">
+            <tbody>
+              <tr>
+                <td style="vertical-align: top; width: 50%">
+                  <div></div>
+                  <span class="pcs-orgname"
+                    ><b>{{ data[0]["username"] }}</b></span
+                  ><br /><span class="pcs-label">
+                    <span
+                      id="tmp_org_address"
+                      style="white-space: pre-wrap; word-wrap: break-word"
+                      >{{ data[0]["userstate"] + "," }} &#10;{{
+                        data[0]["usercountry"]
+                      }}&#10;{{ data[0]["email"] }}</span
+                    >
+                  </span>
+                </td>
+                <td
+                  style="vertical-align: top; width: 50%"
+                  class="text-align-right"
+                >
+                  <span class="pcs-entity-title">PURCHASE ORDER</span><br />
+                  <span
+                    class="pcs-label"
+                    style="font-size: 10pt"
+                    id="tmp_entity_number"
+                    ><b>Purchase Order# {{ data[0]["pono"] }}</b></span
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table style="width: 100%; margin-top: 30px; table-layout: fixed">
+            <tr>
+              <td
+                style="
+                  width: 60%;
+                  vertical-align: bottom;
+                  word-wrap: break-word;
+                "
+              >
+                <div>
+                  <label
+                    id="tmp_billing_address_label"
+                    class="pcs-label"
+                    style="font-size: 10pt"
+                    >Bill To</label
+                  >
+                  <br />
+                  <span id="tmp_billing_address" style="white-space: pre-wrap"
+                    ><strong
+                      ><span
+                        id="zb-pdf-customer-detail"
+                        class="pcs-customer-name"
+                        >{{ data[0]["username"] }}</span
+                      ></strong
+                    ></span
+                  >
+                </div>
+              </td>
+              <td
+                style="vertical-align: bottom; width: 98%"
+                class="text-align-right"
+              >
+                <table
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                  style="
+                    float: right;
+                    table-layout: fixed;
+                    word-wrap: break-word;
+                    width: 100%;
+                  "
+                >
+                  <tbody>
+                    <tr>
+                      <td
+                        style="font-size: 10pt; text-align: right; width: 79%"
+                        class="text-align-right entity-details-padding"
+                      >
+                        <span class="pcs-label">Order Date :</span>
+                      </td>
+                      <td class="text-align-right">
+                        <span id="tmp_entity_date">{{ data[0]["date"] }}</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </table>
+          <table
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            class="pcs-itemtable"
+            style="width: 100%; margin-top: 20px; table-layout: fixed"
+          >
+            <thead>
+              <tr style="height: 32px">
+                <td
+                  class="pcs-itemtable-header pcs-itemtable-breakword"
+                  id=""
+                  style="
+                    padding: 5px 0px 5px 5px;
+                    width: 5%;
+                    text-align: center;
+                  "
+                >
+                  #
+                </td>
+                <td
+                  class="pcs-itemtable-header pcs-itemtable-breakword"
+                  id=""
+                  style="padding: 5px 10px 5px 20px; text-align: left"
+                >
+                  Item &amp; Description
+                </td>
+                <td
+                  class="pcs-itemtable-header pcs-itemtable-breakword"
+                  id=""
+                  style="
+                    padding: 5px 10px 5px 5px;
+                    width: 11%;
+                    text-align: right;
+                  "
+                >
+                  Qty
+                </td>
+                <td
+                  class="pcs-itemtable-header pcs-itemtable-breakword"
+                  id=""
+                  style="
+                    padding: 5px 10px 5px 5px;
+                    width: 11%;
+                    text-align: right;
+                  "
+                >
+                  Rate
+                </td>
+                <td
+                  class="pcs-itemtable-header pcs-itemtable-breakword"
+                  id=""
+                  style="
+                    padding: 5px 10px 5px 5px;
+                    width: 15%;
+                    text-align: right;
+                  "
+                >
+                  Amount
+                </td>
+              </tr>
+            </thead>
+            <tbody class="itemBody">
+              <tr
+                *ngFor="let d of docData; let i = index"
+                class="breakrow-inside breakrow-after"
+              >
+                <td
+                  class="pcs-item-row"
+                  style="
+                    padding: 10px 0px 10px 5px;
+                    text-align: center;
+                    word-wrap: break-word;
+                  "
+                  valign="top"
+                >
+                  {{ i + 1 }}
+                </td>
+                <td
+                  class="pcs-item-row"
+                  style="padding: 10px 0px 10px 20px"
+                  valign="top"
+                >
+                  <div>
+                    <div>
+                      <span id="tmp_item_name" style="word-wrap: break-word">
+                        {{ d.productname }}</span
+                      ><br />
+                      <span
+                        id="tmp_item_description"
+                        class="pcs-item-desc"
+                        style="white-space: pre-wrap; word-wrap: break-word"
+                      >
+                        {{ d.description }}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                <td
+                  class="pcs-item-row text-align-right"
+                  style="padding: 10px 10px 5px 10px; word-wrap: break-word"
+                  valign="top"
+                >
+                  <span id="tmp_item_qty">{{ d.quantity }}</span>
+                  <!-- <div class="pcs-item-desc">box</div> -->
+                </td>
+                <td
+                  class="pcs-item-row text-align-right"
+                  style="padding: 10px 10px 5px 10px; word-wrap: break-word"
+                  valign="top"
+                >
+                  <span id="tmp_item_rate">{{
+                    d.productprice | currency : "INR"
+                  }}</span>
+                </td>
+                <td
+                  class="pcs-item-row text-align-right line-item-padding"
+                  style="word-wrap: break-word"
+                  valign="top"
+                >
+                  <span id="tmp_item_amount">{{
+                    d.totalamount | currency : "INR"
+                  }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="width: 100%; margin-top: 1px">
+            <div
+              style="width: 45%; padding: 3px 10px 3px 3px; font-size: 9pt"
+              class="float-section-left"
+            >
+              <div style="white-space: pre-wrap"></div>
+            </div>
+            <div style="width: 50%" class="float-section-right">
+              <table width="100%" border="0" cellspacing="0" class="pcs-totals">
+                <tbody>
+                  <!-- <tr>
+                    <td
+                      class="text-align-right entity-details-padding"
+                      valign="middle"
+                    >
+                      Sub Total
+                    </td>
+                    <td
+                      style="width: 120px"
+                      class="text-align-right line-item-padding"
+                      valign="middle"
+                      id="tmp_subtotal"
+                    >
+                      {{ data[0]["total"] }}
+                    </td>
+                  </tr> -->
+                  <tr class="pcs-balance" style="height: 40px">
+                    <td
+                      class="text-align-right entity-details-padding"
+                      valign="middle"
+                    >
+                      <b>Total</b>
+                    </td>
+                    <td
+                      style="width: 120px"
+                      class="text-align-right line-item-padding"
+                      valign="middle"
+                      id="tmp_total"
+                    >
+                      <b> {{ data[0]["total"] | currency : "INR" }}</b>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="clear: both"></div>
+          </div>
+          <div style="margin-top: 30px">
+            <label
+              class="pcs-label"
+              style="display: table-cell; font-size: 10pt; padding-right: 5px"
+              >Authorized Signature</label
+            >
+            <div style="display: table-cell">
+              <div
+                style="
+                  display: inline-block;
+                  width: 200px;
+                  border-bottom: 1px solid #000;
+                "
+              ></div>
+              <div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </c-modal-body>
+</c-modal>
+
+<!-- <c-modal
+  #modalXl
+  id="modalXl"
+  size="xl"
+  [visible]="visableInvoice"
+  (visibleChange)="handlevisibleIvoice($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>View Invoice</h4>
+    <div>
+      <p-button
+        (click)="printInvoice()"
+        styleClass="p-button-raised p-button-text"
+      >
+        <svg cIcon name="cil-print" size="xl" title="Print"></svg>
+      </p-button>
+      <p-button
+        (click)="downloadInvoice()"
+        styleClass="p-button-raised p-button-text"
+      >
+        <svg
+          cIcon
+          name="cil-data-transfer-down"
+          size="xl"
+          title="download"
+        ></svg>
+      </p-button>
+      <p-button
+        (click)="visableInvoice = false"
+        label="Close"
+        styleClass="p-button-raised p-button-text"
+      ></p-button>
+    </div>
+  </c-modal-header>
+  <c-modal-body>
+    <div id="two" #two></div>
+  </c-modal-body>
+</c-modal> -->
+
+<c-card *ngIf="pagePermission?.view?.value == true" class="mb-4">
+  <div style="display: flex; justify-content: flex-end">
+    <span class="p-input-icon-left" style="width: 40%; margin: 5px">
+      <i class="pi pi-search"></i>
+      <input
+        type="text"
+        pInputText
+        (change)="gridPagination.checkSearch($event)"
+        (keyup.enter)="handlePagination('first')"
+        [(ngModel)]="gridPagination.searchTerm"
+        style="width: 100%"
+        placeholder="Search grid"
+      />
+      <i
+        class="pi pi-times"
+        style="right: 4%; cursor: pointer"
+        (click)="
+          gridPagination.searchTerm = '';
+          gridPagination.isSearched ? handlePagination('first') : null;
+          gridPagination.isSearched = false
+        "
+      ></i>
+    </span>
+    <button
+      style="margin: 5px"
+      type="submit"
+      class="btn btn-primary"
+      (click)="handlePagination('first')"
+      [disabled]="
+        gridPagination.searchTerm == undefined ||
+        gridPagination.searchTerm == ''
+      "
+    >
+      Search
+    </button>
+  </div>
+  <ag-grid-angular
+    #myGrid
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowData]="rowData"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    (gridReady)="onGridReady($event)"
+    rowAnimation
+    enableCellTextSelection
+  >
+  </ag-grid-angular>
+  <div class="paginationContainer">
+    <span class="paginationText">{{
+      gridPagination.totalRecords != 0
+        ? gridPagination.currentPage * 100 + 1
+        : 0
+    }}</span>
+    to <span class="paginationText">{{ gridPagination.toRecord }}</span> of
+    <span class="paginationText">{{ gridPagination.totalRecords }}</span>
+    <div style="display: flex; align-items: center">
+      <i
+        class="pi pi-fast-backward paginationIcon"
+        (click)="handlePagination('first')"
+      ></i>
+      <i
+        class="pi pi-caret-left paginationIcon"
+        (click)="handlePagination('previous')"
+      ></i>
+      Page
+      <span class="paginationText">{{ gridPagination.currentPage + 1 }}</span>
+      of {{ gridPagination.totalPages + 1 }}
+      <i
+        class="pi pi-caret-right paginationIcon"
+        (click)="handlePagination('next')"
+      ></i>
+      <i
+        class="pi pi-fast-forward paginationIcon"
+        (click)="handlePagination('last')"
+      ></i>
+    </div>
+  </div>
+</c-card>
+
+<c-modal
+  size="lg"
+  #liveDemoModals
+  [visible]="visiblePay"
+  (visibleChange)="handlePayDemoChange($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>Record payment</h4>
+  </c-modal-header>
+  <c-modal-body>
+    <form [formGroup]="payForm">
+      <c-card class="mb-4">
+        <c-row>
+          <c-col>
+            <div class="p-inputgroup">
+              <button type="button" pButton label="Date"></button>
+              <input
+                formControlName="date"
+                type="date"
+                pInputText
+                placeholder="Date"
+              />
+            </div>
+          </c-col>
+          <c-col>
+            <div class="p-inputgroup">
+              <button type="button" pButton label="Amount"></button>
+              <input
+                type="number"
+                pInputText
+                placeholder="Amount"
+                formControlName="amount"
+              />
+            </div>
+          </c-col>
+        </c-row>
+        <c-row style="display: flex; justify-content: center">
+          <c-col style="display: flex; justify-content: end">
+            <p-button
+              (click)="payForm.valid == true ? savePaid() : null"
+              label="Save"
+              [disabled]="!payForm.valid"
+              styleClass="p-button-raised p-button-text"
+            ></p-button>
+          </c-col>
+          <c-col>
+            <p-button
+              (click)="togglePayDemo()"
+              label="Close"
+              styleClass="p-button-raised p-button-text p-button-secondary"
+            ></p-button>
+          </c-col>
+        </c-row>
+      </c-card>
+    </form>
+  </c-modal-body>
+</c-modal>
+
+<!-- <c-modal
+  #modalXl
+  id="modalXl"
+  alignment="center"
+  size="xl"
+  [visible]="convertToInvoiceModal"
+  (visibleChange)="handleConvertToInvoiceModal($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>Convert to Invoice</h4>
+  </c-modal-header>
+  <c-modal-body>
+    <div id="one" #one>
+      <div class="pcs-template">
+        <div class="pcs-template-body">
+          <table
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            class="pcs-itemtable"
+            style="width: 100%; margin-top: 20px; table-layout: fixed"
+          >
+            <thead>
+              <tr style="height: 32px">
+                <td
+                  class="pcs-itemtable-header pcs-itemtable-breakword"
+                  id=""
+                  style="
+                    padding: 5px 0px 5px 5px;
+                    width: 5%;
+                    text-align: center;
+                  "
+                >
+                  #
+                </td>
+                <td
+                  class="pcs-itemtable-header pcs-itemtable-breakword"
+                  id=""
+                  style="padding: 5px 10px 5px 20px; text-align: left"
+                >
+                  Item &amp; Description
+                </td>
+                <td
+                  class="pcs-itemtable-header pcs-itemtable-breakword"
+                  id=""
+                  style="
+                    padding: 5px 10px 5px 5px;
+                    width: 11%;
+                    text-align: right;
+                  "
+                >
+                  Qty
+                </td>
+                <td
+                  class="pcs-itemtable-header pcs-itemtable-breakword"
+                  id=""
+                  style="
+                    padding: 5px 10px 5px 5px;
+                    width: 11%;
+                    text-align: right;
+                  "
+                >
+                  Rate
+                </td>
+                <td
+                  class="pcs-itemtable-header pcs-itemtable-breakword"
+                  id=""
+                  style="
+                    padding: 5px 10px 5px 5px;
+                    width: 15%;
+                    text-align: right;
+                  "
+                >
+                  Amount
+                </td>
+              </tr>
+            </thead>
+            <tbody class="itemBody">
+              <tr
+                *ngFor="let d of docData; let i = index"
+                class="breakrow-inside breakrow-after"
+              >
+                <td
+                  class="pcs-item-row"
+                  style="
+                    padding: 10px 0px 10px 5px;
+                    text-align: center;
+                    word-wrap: break-word;
+                  "
+                  valign="top"
+                >
+                  {{ i + 1 }}
+                </td>
+                <td
+                  class="pcs-item-row"
+                  style="padding: 10px 0px 10px 20px"
+                  valign="top"
+                >
+                  <div>
+                    <div>
+                      <span id="tmp_item_name" style="word-wrap: break-word">
+                        {{ d.productname }}</span
+                      ><br />
+                      <span
+                        id="tmp_item_description"
+                        class="pcs-item-desc"
+                        style="white-space: pre-wrap; word-wrap: break-word"
+                      >
+                        {{ d.description }}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                <td
+                  class="pcs-item-row text-align-right"
+                  style="padding: 10px 10px 5px 10px; word-wrap: break-word"
+                  valign="top"
+                >
+                  <span id="tmp_item_qty">{{ d.quantity }}</span>
+                </td>
+                <td
+                  class="pcs-item-row text-align-right"
+                  style="padding: 10px 10px 5px 10px; word-wrap: break-word"
+                  valign="top"
+                >
+                  <span id="tmp_item_rate">{{
+                    d.productprice | currency : "INR"
+                  }}</span>
+                </td>
+                <td
+                  class="pcs-item-row text-align-right line-item-padding"
+                  style="word-wrap: break-word"
+                  valign="top"
+                >
+                  <span id="tmp_item_amount">{{
+                    d.totalamount | currency : "INR"
+                  }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="width: 100%; margin-top: 1px">
+            <div
+              style="width: 45%; padding: 3px 10px 3px 3px; font-size: 9pt"
+              class="float-section-left"
+            >
+              <div style="white-space: pre-wrap"></div>
+            </div>
+            <div style="width: 50%" class="float-section-right">
+              <table width="100%" border="0" cellspacing="0" class="pcs-totals">
+                <tbody>
+                  <!-- <tr>
+                    <td
+                      class="text-align-right entity-details-padding"
+                      valign="middle"
+                    >
+                      Sub Total
+                    </td>
+                    <td
+                      style="width: 120px"
+                      class="text-align-right line-item-padding"
+                      valign="middle"
+                      id="tmp_subtotal"
+                    >
+                      {{ data[0]["total"] }}
+                    </td>
+                  </tr> --
+                  <tr class="pcs-balance" style="height: 40px">
+                    <td
+                      class="text-align-right entity-details-padding"
+                      valign="middle"
+                    >
+                      <b>Total</b>
+                    </td>
+                    <td
+                      style="width: 120px"
+                      class="text-align-right line-item-padding"
+                      valign="middle"
+                      id="tmp_total"
+                    >
+                      <b> {{ data[0]["total"] | currency : "INR" }}</b>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> </c-modal-body
+  ><c-modal-footer>
+    <p-button
+      #convertToInvoice
+      (click)="pay()"
+      label="Convert to Invoice"
+      styleClass="p-button-raised p-button-text"
+    ></p-button>
+    <p-button
+      (click)="convertToInvoiceModal = false"
+      label="Close"
+      styleClass="p-button-raised p-button-text"
+    ></p-button>
+  </c-modal-footer>
+</c-modal> -->
+
+<c-modal
+  [visible]="acceptModalToggle"
+  (visibleChange)="handleAcceptModalChange($event)"
+  #verticallyCenteredModal
+  alignment="center"
+  size="lg"
+>
+  <c-modal-header>
+    <h5 cModalTitle>PO Accept Details</h5>
+    <button (click)="toggleAcceptModel()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <form [formGroup]="acceptForm">
+      <c-row>
+        <c-input-group class="mb-3">
+          <span cInputGroupText id="basic-addon1">Customer ID</span>
+          <input
+            aria-describedby="basic-addon1"
+            formControlName="customerid"
+            cFormControl
+          />
+        </c-input-group>
+      </c-row>
+
+      <c-row>
+        <c-col>
+          <c-input-group class="mb-3">
+            <span cInputGroupText id="basic-addon1">PO Number</span>
+            <input
+              aria-describedby="basic-addon1"
+              formControlName="ponumber"
+              cFormControl
+            />
+          </c-input-group>
+        </c-col>
+        <c-col>
+          <c-input-group class="mb-3">
+            <span cInputGroupText id="basic-addon1">PO Date</span>
+            <input
+              aria-describedby="basic-addon1"
+              formControlName="podate"
+              cFormControl
+            />
+          </c-input-group>
+        </c-col>
+      </c-row>
+
+      <c-row>
+        <c-col>
+          <c-input-group class="mb-3">
+            <span cInputGroupText id="basic-addon1">Invoice Date</span>
+            <input
+              aria-describedby="basic-addon1"
+              formControlName="invoicedate"
+              cFormControl
+            />
+          </c-input-group>
+        </c-col>
+        <c-col>
+          <c-input-group class="mb-3">
+            <span cInputGroupText id="basic-addon1">Total Qty</span>
+            <input
+              aria-describedby="basic-addon1"
+              formControlName="totalqty"
+              cFormControl
+            />
+          </c-input-group>
+        </c-col>
+      </c-row>
+
+      <c-row>
+        <c-input-group class="mb-3">
+          <span cInputGroupText id="basic-addon1">Total Amount</span>
+          <input
+            aria-describedby="basic-addon1"
+            formControlName="totalamount"
+            cFormControl
+          />
+        </c-input-group>
+      </c-row>
+    </form>
+  </c-modal-body>
+  <c-modal-footer>
+    <button (click)="toggleConfirm()" cButton color="primary">Submit</button>
+    <button (click)="toggleAcceptModel()" cButton color="secondary">
+      Close
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<c-modal [visible]="acceptConfirm" #verticallyCenteredModal alignment="center">
+  <c-modal-header>
+    <h5 cModalTitle>Confirm</h5>
+    <button (click)="toggleConfirm()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>Are you sure you want to accept ?</c-modal-body>
+  <c-modal-footer>
+    <button (click)="accept()" cButton color="primary">Yes</button>
+    <button (click)="toggleConfirm()" cButton color="secondary">No</button>
+  </c-modal-footer>
+</c-modal>
+
+<c-modal
+  [visible]="rejectModalToggle"
+  #verticallyCenteredModal
+  alignment="center"
+>
+  <c-modal-header>
+    <h5 cModalTitle>PO Reject Details</h5>
+    <button (click)="toggleReject()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <textarea
+      [(ngModel)]="reason"
+      class="textArea"
+      style="margin-top: 4px; border: none; resize: none"
+      placeholder="Enter the reason"
+      rows="4"
+      cols="60"
+      cFormControl
+      id="exampleFormControlTextarea1"
+    ></textarea>
+  </c-modal-body>
+  <c-modal-footer>
+    <button
+      (click)="rejected()"
+      [disabled]="reason == '' || reason == undefined"
+      cButton
+      color="primary"
+    >
+      Submit
+    </button>
+    <button (click)="toggleReject()" cButton color="secondary">Close</button>
+  </c-modal-footer></c-modal
+>
+
+<c-modal
+  [visible]="rejectedModalToggle"
+  #verticallyCenteredModal
+  alignment="center"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Rejected Details</h5>
+    <button (click)="Rejectedtoggle()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <textarea
+      [(ngModel)]="reason"
+      class="textArea"
+      style="margin-top: 4px; border: 4px solid #ccc7f6; resize: none"
+      placeholder="Enter the reason"
+      rows="4"
+      cols="60"
+      readonly
+      cFormControl
+      id="exampleFormControlTextarea1"
+    ></textarea>
+  </c-modal-body>
+</c-modal>
+
+<c-modal
+  [visible]="ShipmentModalToggle"
+  (visibleChange)="handleShipmentModalChange($event)"
+  #verticallyCenteredModal
+  alignment="center"
+  size="lg"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Shipping Details</h5>
+    <button (click)="toggleShipmentModal()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <form [formGroup]="shipmentForm">
+      <c-row>
+        <c-col sm="6">
+          <c-input-group class="mb-3" sizing="sm">
+            <span cInputGroupText id="basic-addon1">PO Number :</span>
+            <input
+              aria-describedby="basic-addon1"
+              aria-label="Username"
+              class="dimmed-input"
+              formControlName="ponumber"
+              cFormControl
+              placeholder="Enter the PO number"
+            />
+          </c-input-group>
+        </c-col>
+      </c-row>
+      <c-row>
+        <c-col sm="6">
+          <c-input-group class="mb-3" sizing="sm">
+            <span cInputGroupText id="basic-addon1">Shipping Date : </span>
+            <input
+              aria-describedby="basic-addon1"
+              type="date"
+              [max]="maxDate"
+              aria-label="Username"
+              class="dimmed-input"
+              formControlName="trackingdate"
+              cFormControl
+              placeholder="Enter the tracking no"
+            />
+          </c-input-group>
+        </c-col>
+        <c-col sm="6">
+          <c-input-group class="mb-3" sizing="sm">
+            <span cInputGroupText id="basic-addon1">Tracking No :</span>
+            <input
+              aria-describedby="basic-addon1"
+              aria-label="Username"
+              class="dimmed-input"
+              formControlName="trackingno"
+              cFormControl
+              placeholder="Enter the tracking no"
+            />
+          </c-input-group>
+        </c-col>
+      </c-row>
+
+      <c-row>
+        <c-col sm="6" style="font-weight: bold">Billing Adress </c-col>
+
+        <c-col sm="4" style="font-weight: bold">Shipping Address </c-col>
+        <c-col style="justify-content: end">
+          <button cButton color="secondary" (click)="openchangeaddress()">
+            Change
+          </button>
+        </c-col>
+      </c-row>
+      <c-row>
+        <c-col sm="6">
+          <textarea
+            cFormControl
+            id="exampleFormControlTextarea1"
+            formControlName="billingaddress"
+            rows="1"
+            style="height: 125px"
+          ></textarea>
+        </c-col>
+
+        <c-col sm="6">
+          <textarea
+            cFormControl
+            id="exampleFormControlTextarea1"
+            formControlName="shippingaddress"
+            rows="1"
+            style="height: 125px"
+          ></textarea>
+        </c-col>
+      </c-row>
+    </form>
+  </c-modal-body>
+  <c-modal-footer>
+    <button
+      (click)="submit()"
+      [disabled]="!shipmentForm.valid"
+      cButton
+      color="primary"
+    >
+      Submit
+    </button>
+    <button (click)="toggleShipmentModal()" cButton color="secondary">
+      Close
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<c-modal
+  [visible]="changeaddressConfirm"
+  (visibleChange)="handleChagesaddressModalChange($event)"
+  #verticallyCenteredModal
+  alignment="center"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Add New Address</h5>
+    <button (click)="openchangeaddress()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <p-dropdown
+      [style]="{ width: '29vw', height: '20%' }"
+      placeholder="Select the address"
+      [showClear]="true"
+      [options]="addressOptions"
+      [(ngModel)]="address"
+      [filter]="true"
+      optionValue="full_address"
+      optionLabel="full_address"
+      filterBy="full_address"
+    ></p-dropdown>
+  </c-modal-body>
+  <c-modal-footer>
+    <button (click)="updateadress()" cButton color="primary">Submit</button>
+    <button (click)="openchangeaddress()" cButton color="secondary">
+      Close
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<c-modal
+  [visible]="trackorderModalToggle"
+  (visibleChange)="handleTrackModalChange($event)"
+  #verticallyCenteredModal
+  alignment="center"
+  size="lg"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Track Order</h5>
+    <button (click)="trackOModel()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <div class="details-container">
+      <div class="row">
+        <div class="col-md-6">
+          <strong>Company Name:</strong> {{ this.trackingDetails?.companyname }}
+        </div>
+        <div class="col-md-6">
+          <strong>Expected Delivery Date:</strong>
+          {{ this.trackingDetails?.expecteddeliverydate }}
+        </div>
+        <div class="col-md-6">
+          <strong>Purchase Order:</strong> {{ this.trackingDetails?.pono }}
+        </div>
+        <div class="col-md-6">
+          <strong>Purchase Date:</strong> {{ this.trackingDetails?.podate }}
+        </div>
+        <div class="col-md-6">
+          <strong>Tracking No:</strong> {{ this.trackingDetails?.trackingno }}
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 10px" class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="status-text">
+              <span class="status">Order Placed</span>
+              <span class="status">Accepted </span>
+              <span class="status">Payment Received</span>
+              <span class="status">Stock Assigned</span>
+              <span class="status">Shipped</span>
+            </div>
+            <div class="delivery-status">
+              <div class="stage-indicators">
+                <div
+                  class="stage-circle active"
+                  style="left: 0%"
+                  (mouseover)="
+                    displayDetail(
+                      trackingDetails?.orderplacedon,
+                      'Thank you for your order! Your purchase has been successfully placed, and we are now processing your request.'
+                    )
+                  "
+                ></div>
+                <div
+                  class="stage-circle"
+                  style="left: 24%"
+                  (mouseover)="
+                    displayDetail(
+                      trackingDetails?.orderacceptedon,
+                      'Order Accepted On'
+                    )
+                  "
+                ></div>
+                <div
+                  class="stage-circle"
+                  style="left: 49%"
+                  (mouseover)="
+                    displayDetail(
+                      trackingDetails?.paymentreceivedon,
+                      'Payment Received On'
+                    )
+                  "
+                ></div>
+
+                <div
+                  class="stage-circle"
+                  style="left: 75%"
+                  (mouseover)="
+                    displayDetail(
+                      trackingDetails?.stockassignedon,
+                      'Stock Assigned On'
+                    )
+                  "
+                ></div>
+
+                <div
+                  class="stage-circle"
+                  style="left: 99%"
+                  (mouseover)="
+                    displayDetail(
+                      trackingDetails?.ordershippedon,
+                      'Order Shipped On'
+                    )
+                  "
+                ></div>
+              </div>
+              <div class="range-bar">
+                <div class="range-progress"></div>
+              </div>
+            </div>
+
+            <div class="status-date">
+              <span
+                class="statuss"
+                *ngIf="trackingDetails?.orderplacedon"
+                (mouseover)="
+                  displayDetail(
+                    trackingDetails?.orderplacedon,
+                    'Order Placed On'
+                  )
+                "
+                >{{ trackingDetails.orderplacedon }}</span
+              >
+              <span
+                class="statuss"
+                style="margin-left: 85px"
+                *ngIf="trackingDetails?.orderacceptedon"
+                (mouseover)="
+                  displayDetail(
+                    trackingDetails?.orderacceptedon,
+                    'Order Accepted On'
+                  )
+                "
+                >{{ trackingDetails.orderacceptedon }}
+              </span>
+              <span
+                class="statuss"
+                style="margin-left: 100px"
+                *ngIf="trackingDetails?.paymentreceivedon"
+                (mouseover)="
+                  displayDetail(
+                    trackingDetails?.paymentreceivedon,
+                    'Payment Received On'
+                  )
+                "
+                >{{ trackingDetails.paymentreceivedon }}</span
+              >
+              <span
+                class="statuss"
+                style="margin-left: 120px"
+                *ngIf="trackingDetails?.stockassignedon"
+                (mouseover)="
+                  displayDetail(
+                    trackingDetails?.stockassignedon,
+                    'Stock Assigned On'
+                  )
+                "
+                >{{ trackingDetails.stockassignedon }}</span
+              >
+              <span
+                class="statuss"
+                style="margin-left: 90px"
+                *ngIf="trackingDetails?.ordershippedon"
+                (mouseover)="
+                  displayDetail(
+                    trackingDetails?.ordershippedon,
+                    'Order Shipped On'
+                  )
+                "
+                >{{ trackingDetails.ordershippedon }}</span
+              >
+            </div>
+            <div>
+              <hr />
+              <div class="hovered-detail" *ngIf="hoveredDetail">
+                {{ hoveredDetail }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </c-modal-body>
+</c-modal>

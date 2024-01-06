@@ -1,0 +1,433 @@
+<button cButton class="floatingButton" (click)="export()" title="Export">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 1px"
+  ></i>
+</button>
+<p-toast key="toast1"></p-toast>
+<c-col
+  style="display: flex; justify-content: flex-end; margin: 10px"
+  *ngIf="pagePermission?.add?.value"
+>
+  <button
+    cButton
+    (click)="toggleLiveDemo()"
+    style="background-color: red; border-style: none"
+  >
+    Add
+  </button>
+</c-col>
+<c-modal
+  size="xl"
+  #liveDemoModal
+  id="liveDemoModal"
+  [visible]="visible"
+  (visibleChange)="handleLiveDemoChange($event)"
+>
+  <c-modal-header>
+    <h4 cModalTitle>
+      {{ formAction == "new" ? "Create New User" : "Edit User" }}
+    </h4>
+  </c-modal-header>
+  <c-modal-body>
+    <form cForm [formGroup]="userForm">
+      <div>
+        <div class="d-flex justify-content-between mb-1.5">
+          <h5>Login Details</h5>
+        </div>
+        <div class="form-group">
+          <c-row>
+            <c-col *ngIf="userForm.controls['primaryemail'] as ctrl">
+              <label for="primaryemail">Primary Email</label>
+              <input
+                cFormControl
+                formControlName="primaryemail"
+                type="email"
+                [readOnly]="endisCon"
+                class="form-control"
+                id="primaryemail"
+                placeholder="Enter the primary email"
+                [valid]="
+                  ctrl.touched && ctrl.valid
+                    ? true
+                    : ctrl.touched && ctrl.invalid
+                    ? false
+                    : undefined
+                "
+              />
+              <c-form-feedback *ngIf="ctrl.invalid" [valid]="!ctrl.invalid">
+                <ng-container *ngIf="ctrl.errors as errors">
+                  <div *ngIf="errors['email']">Enter a Valid Email</div>
+                </ng-container>
+              </c-form-feedback>
+            </c-col>
+            <c-col *ngIf="userForm.controls['secondarycontactno'] as ctrl">
+              <label for="secondaryemail">Secondary Email</label>
+              <input
+                cFormControl
+                formControlName="secondaryemail"
+                type="email"
+                class="form-control"
+                id="secondaryemail"
+                placeholder="Enter the secondary email"
+                [valid]="
+                  ctrl.touched && ctrl.valid
+                    ? true
+                    : ctrl.touched && ctrl.invalid
+                    ? false
+                    : undefined
+                "
+              />
+              <c-form-feedback *ngIf="ctrl.invalid" [valid]="!ctrl.invalid">
+                <ng-container *ngIf="ctrl.errors as errors">
+                  <div *ngIf="errors['email']">Enter a Valid Email</div>
+                </ng-container>
+              </c-form-feedback>
+            </c-col>
+          </c-row>
+
+          <c-row style="width: 51.3%">
+            <c-col *ngIf="userForm.controls['password'] as ctrl">
+              <label for="password">Password</label>
+              <div
+                style="position: relative; display: flex; justify-content: end"
+              >
+                <input
+                  cFormControl
+                  formControlName="password"
+                  type="{{ password_type }}"
+                  class="form-control"
+                  id="password"
+                  placeholder="Enter the password"
+                />
+                <i
+                  [ngClass]="eye_icon ? 'pi pi-eye' : 'pi pi-eye-slash'"
+                  style="
+                    font-size: 1.2rem;
+                    position: absolute;
+                    margin-right: 10px;
+                    top: 22%;
+                  "
+                  (click)="showHidePass()"
+                ></i>
+              </div>
+            </c-col>
+            <c-col *ngIf="userForm.controls['roleid'] as ctrl">
+              <label for="address">Roll Name</label>
+              <p-dropdown
+                autoWidth="false"
+                [style]="{ width: '100%' }"
+                [options]="role"
+                optionValue="id"
+                optionLabel="name"
+                [filter]="true"
+                filterBy="name"
+                formControlName="roleid"
+                [showClear]="true"
+                placeholder="Select the role name "
+              >
+                <ng-template let-role pTemplate="item">
+                  <div class="flex align-items-center gap-2">
+                    <div>{{ role.name }}</div>
+                  </div>
+                </ng-template>
+              </p-dropdown>
+            </c-col>
+          </c-row>
+        </div>
+      </div>
+      <div>
+        <div class="d-flex justify-content-between mb-1.5 mt-4">
+          <h5>User Details</h5>
+        </div>
+        <div class="form-group">
+          <c-row>
+            <c-col *ngIf="userForm.controls['firstname'] as ctrl">
+              <label for="firstName">First Name</label>
+              <input
+                cFormControl
+                formControlName="firstname"
+                type="text"
+                class="form-control"
+                id="firstName"
+                placeholder="Enter the first name"
+                [valid]="
+                  ctrl.touched && ctrl.valid
+                    ? true
+                    : ctrl.touched && ctrl.invalid
+                    ? false
+                    : undefined
+                "
+              />
+            </c-col>
+            <c-col *ngIf="userForm.controls['lastname'] as ctrl">
+              <label for="lastName">Last Name</label>
+              <input
+                cFormControl
+                formControlName="lastname"
+                type="text"
+                class="form-control"
+                id="lastName"
+                placeholder="Enter the last name"
+                [valid]="
+                  ctrl.touched && ctrl.valid
+                    ? true
+                    : ctrl.touched && ctrl.invalid
+                    ? false
+                    : undefined
+                "
+              />
+            </c-col>
+          </c-row>
+        </div>
+
+        <div class="form-group">
+          <c-row>
+            <c-col *ngIf="userForm.controls['contactno'] as ctrl">
+              <label for="contactNumber">Contact Number</label>
+              <input
+                cFormControl
+                formControlName="contactno"
+                type="number"
+                class="form-control"
+                id="contactNumber"
+                [readOnly]="endisCon"
+                placeholder="Enter the contact number"
+                [valid]="
+                  ctrl.touched && ctrl.valid
+                    ? true
+                    : ctrl.touched && ctrl.invalid
+                    ? false
+                    : undefined
+                "
+              />
+              <c-form-feedback *ngIf="ctrl.invalid" [valid]="!ctrl.invalid">
+                <ng-container *ngIf="ctrl.errors as errors">
+                  <div *ngIf="errors['minlength']">Enter a 10 Digit Number</div>
+                </ng-container>
+              </c-form-feedback>
+            </c-col>
+            <c-col *ngIf="userForm.controls['secondarycontactno'] as ctrl">
+              <label for="secondarycontactno">Secondary Contact Number</label>
+              <input
+                cFormControl
+                formControlName="secondarycontactno"
+                type="number"
+                class="form-control"
+                id="secondarycontactno"
+                placeholder="Enter the secondary contact number"
+                [valid]="
+                  ctrl.touched && ctrl.valid
+                    ? true
+                    : ctrl.touched && ctrl.invalid
+                    ? false
+                    : undefined
+                "
+              />
+              <c-form-feedback *ngIf="ctrl.invalid" [valid]="!ctrl.invalid">
+                <ng-container *ngIf="ctrl.errors as errors">
+                  <div *ngIf="errors['minlength']">Enter a 10 Digit Number</div>
+                </ng-container>
+              </c-form-feedback>
+            </c-col>
+          </c-row>
+        </div>
+
+        <div class="form-group">
+          <c-row>
+            <c-col *ngIf="userForm.controls['idtype'] as ctrl">
+              <label for="country"> Id Proof type</label>
+
+              <p-dropdown
+                autoWidth="false"
+                [style]="{ width: '100%' }"
+                [filter]="true"
+                filterBy="idname"
+                placeholder="Select Id type"
+                formControlName="idtype"
+                [options]="idtype"
+                optionValue="idname"
+                optionLabel="idname"
+                [filter]="true"
+                [showClear]="true"
+              >
+                <ng-template let-idtype pTemplate="item">
+                  <div class="flex align-items-center gap-2">
+                    <div>{{ idtype.idname }}</div>
+                  </div>
+                </ng-template></p-dropdown
+              >
+            </c-col>
+            <c-col *ngIf="userForm.controls['idno'] as ctrl">
+              <label for="country"> Id Proof No</label>
+              <input
+                cFormControl
+                formControlName="idno"
+                type="text"
+                class="form-control"
+                id="idno"
+                placeholder="Enter the Id no"
+                [valid]="
+                  ctrl.touched && ctrl.valid
+                    ? true
+                    : ctrl.touched && ctrl.invalid
+                    ? false
+                    : undefined
+                "
+              />
+            </c-col>
+          </c-row>
+          <c-row style="width: 51%"> </c-row>
+        </div>
+
+        <!-- <div class="form-group">
+          <c-row>
+            <c-col *ngIf="userForm.controls['contactno'] as ctrl">
+              <label for="contactNumber">Contact Number</label>
+              <input
+                cFormControl
+                formControlName="contactno"
+                type="number"
+                class="form-control"
+                id="contactNumber"
+                placeholder="Enter contact number"
+                [valid]="
+                  ctrl.touched && ctrl.valid
+                    ? true
+                    : ctrl.touched && ctrl.invalid
+                    ? false
+                    : undefined
+                "
+              />
+            </c-col>
+            <c-col *ngIf="userForm.controls['contactno'] as ctrl">
+              <label for="contactNumber">Contact Number</label>
+              <input
+                cFormControl
+                formControlName="contactno"
+                type="number"
+                class="form-control"
+                id="contactNumber"
+                placeholder="Enter contact number"
+                [valid]="
+                  ctrl.touched && ctrl.valid
+                    ? true
+                    : ctrl.touched && ctrl.invalid
+                    ? false
+                    : undefined
+                "
+              />
+            </c-col>
+          </c-row>
+        </div> -->
+        <!-- <div class="form-group">
+          <c-row>
+            <c-col *ngIf="userForm.controls['contactno'] as ctrl">
+              <label for="contactNumber">Contact Number</label>
+              <input
+                cFormControl
+                formControlName="contactno"
+                type="number"
+                class="form-control"
+                id="contactNumber"
+                placeholder="Enter contact number"
+                [valid]="
+                  ctrl.touched && ctrl.valid
+                    ? true
+                    : ctrl.touched && ctrl.invalid
+                    ? false
+                    : undefined
+                "
+              />
+            </c-col>
+            <c-col *ngIf="userForm.controls['contactno'] as ctrl">
+              <label for="contactNumber">Contact Number</label>
+              <input
+                cFormControl
+                formControlName="contactno"
+                type="number"
+                class="form-control"
+                id="contactNumber"
+                placeholder="Enter contact number"
+                [valid]="
+                  ctrl.touched && ctrl.valid
+                    ? true
+                    : ctrl.touched && ctrl.invalid
+                    ? false
+                    : undefined
+                "
+              />
+            </c-col>
+          </c-row>
+        </div> -->
+      </div>
+
+      <div class="onoffswitch">
+        <input
+          type="checkbox"
+          formControlName="status"
+          name="onoffswitch"
+          class="onoffswitch-checkbox"
+          id="myonoffswitch"
+        />
+
+        <label class="onoffswitch-label" for="myonoffswitch">
+          <span class="onoffswitch-inner"></span>
+          <span class="onoffswitch-switch"></span>
+        </label>
+      </div>
+
+      <div class="d-flex justify-content-center mt-4">
+        <button
+          *ngIf="formAction == 'new'"
+          type="submit"
+          class="btn btn-primary"
+          (click)="onSubmit('submit')"
+          [disabled]="userForm.pristine || userForm.invalid"
+        >
+          Submit
+        </button>
+        <button
+          *ngIf="formAction == 'edit'"
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="userForm.invalid"
+          (click)="onSubmit('edit')"
+        >
+          Edit
+        </button>
+        <div style="width: 10px"></div>
+        <button type="button" class="btn btn-secondary" (click)="onCancel()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </c-modal-body>
+</c-modal>
+
+<c-card *ngIf="pagePermission?.view?.value == true" class="mb-4">
+  <ag-grid-angular
+    #myGrid
+    [pagination]="true"
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowData]="rowData"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    rowAnimation
+    (gridReady)="onGridReady()"
+    enableCellTextSelection
+    [paginationPageSize]="selectedRowSize"
+  >
+  </ag-grid-angular>
+  <div
+    class="card flex justify-content-center"
+    style="position: absolute; bottom: 0px; margin: 0 0 6px 5px"
+  >
+    <p-dropdown
+      [style]="{ width: '100%', 'max-height': '35px' }"
+      [(ngModel)]="selectedRowSize"
+      [options]="[100, 200, 500, 1000]"
+    ></p-dropdown>
+  </div>
+</c-card>

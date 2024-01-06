@@ -1,0 +1,285 @@
+<button cButton class="floatingButton" (click)="export()" title="Export">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 1px"
+  ></i>
+</button>
+<div [visible]="visible" cCollapse>
+  <p-toast key="toast1"></p-toast>
+  <c-card class="mt-3 shadow">
+    <c-card-body>
+      <form [formGroup]="accountsMapping">
+        <c-row class="align-items-start">
+          <c-col sm="6" style="margin-bottom: 15px">
+            <p-dropdown
+              autoWidth="false"
+              [style]="{ width: '100%' }"
+              [options]="provider"
+              [filter]="true"
+              formControlName="simprovider"
+              optionLabel="companyname"
+              optionValue="companyname"
+              filterBy="companyname"
+              [showClear]="true"
+              placeholder="Select a company"
+            >
+            </p-dropdown>
+          </c-col>
+          <c-col sm="6">
+            <p-dropdown
+              autoWidth="false"
+              [style]="{ width: '100%' }"
+              [options]="productlist"
+              optionLabel="productname"
+              optionValue="productname"
+              [filter]="true"
+              filterBy="productname"
+              formControlName="planname"
+              [showClear]="true"
+              placeholder="Select the product"
+              (onChange)="onProductdetails($event.value)"
+            >
+            </p-dropdown>
+          </c-col>
+        </c-row>
+
+        <c-row>
+          <c-col sm="6">
+            <c-input-group class="mb-3" sizing="sm">
+              <span style="width: 35%" cInputGroupText id="basic-addon1"
+                >Purchase Rate</span
+              >
+              <input
+                aria-describedby="basic-addon1"
+                aria-label="Username"
+                class="dimmed-input"
+                formControlName="accountno"
+                cFormControl
+                placeholder="Enter the purchase rate"
+              />
+            </c-input-group>
+          </c-col>
+          <c-col sm="6">
+            <c-input-group class="mb-3" sizing="sm">
+              <span style="width: 35%" cInputGroupText id="basic-addon1"
+                >Product Rate</span
+              >
+              <input
+                aria-describedby="basic-addon1"
+                aria-label="Username"
+                class="dimmed-input"
+                formControlName="customerrate"
+                cFormControl
+                placeholder="Enter the product rate"
+              />
+            </c-input-group>
+          </c-col>
+        </c-row>
+
+        <c-row>
+          <c-col sm="6">
+            <c-input-group class="mb-3" sizing="sm">
+              <span style="width: 35%" cInputGroupText id="basic-addon1"
+                >Customer Rate</span
+              >
+              <input
+                aria-describedby="basic-addon1"
+                aria-label="Username"
+                type="number"
+                formControlName="rate"
+                cFormControl
+                placeholder="Enter the customer rate"
+              />
+            </c-input-group>
+          </c-col>
+          <c-col sm="6">
+            <c-input-group class="mb-3" sizing="sm">
+              <span style="width: 35%" cInputGroupText id="basic-addon1"
+                >Product Description</span
+              >
+              <input
+                aria-describedby="basic-addon1"
+                aria-label="Username"
+                formControlName="description"
+                cFormControl
+                placeholder="Enter the product description"
+              />
+            </c-input-group>
+          </c-col>
+        </c-row>
+
+        <c-row>
+          <c-col sm="6">
+            <c-input-group class="mb-3" sizing="sm">
+              <span style="width: 35%" cInputGroupText id="basic-addon1"
+                >Initial Payment %</span
+              >
+              <input
+                aria-describedby="basic-addon1"
+                type="number"
+                aria-label="Username"
+                [(ngModel)]="initialPercentageValue"
+                (input)="updateBalancePercentage()"
+                formControlName="initialpercentage"
+                cFormControl
+                placeholder="Enter the initial percentage"
+              />
+            </c-input-group>
+          </c-col>
+          <c-col sm="6">
+            <c-input-group class="mb-3" sizing="sm">
+              <span style="width: 35%" cInputGroupText id="basic-addon1"
+                >Balance Payment %</span
+              >
+              <input
+                aria-describedby="basic-addon1"
+                class="dimmed-input"
+                type="number"
+                aria-label="Username"
+                formControlName="balancepercentage"
+                cFormControl
+                placeholder="Balance percentage"
+              />
+            </c-input-group> </c-col
+        ></c-row>
+
+        <c-row>
+          <c-col>
+            <div class="d-flex justify-content-center mt-4">
+              <button
+                type="submit"
+                class="btn btn-primary"
+                (click)="isEdit ? save('edit') : save('save')"
+                [disabled]="!accountsMapping.valid"
+              >
+                {{ isEdit ? "Save" : "Submit" }}
+              </button>
+              <div style="width: 10px"></div>
+              <button type="button" class="btn btn-secondary" (click)="clear()">
+                Clear
+              </button>
+            </div>
+
+            <!-- <div style="justify-content: center; display: flex">
+              <div>
+                <button
+                  style="margin-right: 10px"
+                  size="sm"
+                  cButton
+                  class="btn btn-primary"
+                  (click)="isEdit ? save('edit') : save('save')"
+                  [disabled]="!accountsMapping.valid"
+                  variant="outline"
+                >
+                  {{ isEdit ? "Save" : "Submit" }}
+                </button>
+              </div>
+              <div>
+                <button
+                  size="sm"
+                  style="margin-left: 10px"
+                  cButton
+                  (click)="clear()"
+                  color="dark"
+                  variant="outline"
+                >
+                  Clear
+                </button>
+              </div>
+            </div> -->
+          </c-col>
+        </c-row>
+      </form>
+    </c-card-body>
+  </c-card>
+</div>
+
+<c-row
+  style="justify-content: end; margin: 10px 0px"
+  *ngIf="pagePermission.add.value"
+>
+  <button (click)="toggleCollapse()" size="sm" cButton color="primary">
+    <svg cIcon name="{{ visible ? 'cilArrowTop' : 'cilArrowBottom' }}"></svg>
+    {{ visible ? "Close" : "Open" }}
+  </button>
+</c-row>
+
+<c-card class="mb-4">
+  <div style="display: flex; justify-content: flex-end">
+    <span class="p-input-icon-left" style="width: 40%; margin: 5px">
+      <i class="pi pi-search"></i>
+      <input
+        type="text"
+        pInputText
+        (change)="gridPagination.checkSearch($event)"
+        (keyup.enter)="handlePagination('first')"
+        [(ngModel)]="gridPagination.searchTerm"
+        style="width: 100%"
+        placeholder="Search grid"
+      />
+      <i
+        class="pi pi-times"
+        style="right: 4%; cursor: pointer"
+        (click)="
+          gridPagination.searchTerm = '';
+          gridPagination.isSearched ? handlePagination('first') : null;
+          gridPagination.isSearched = false
+        "
+      ></i>
+    </span>
+    <button
+      style="margin: 5px"
+      type="submit"
+      class="btn btn-primary"
+      (click)="handlePagination('first')"
+      [disabled]="
+        gridPagination.searchTerm == undefined ||
+        gridPagination.searchTerm == ''
+      "
+    >
+      Search
+    </button>
+  </div>
+  <ag-grid-angular
+    #myGrid
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowData]="rowData"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    (gridReady)="onGridReady($event)"
+    rowAnimation
+    enableCellTextSelection
+  >
+  </ag-grid-angular>
+  <div class="paginationContainer">
+    <span class="paginationText">{{
+      gridPagination.totalRecords != 0
+        ? gridPagination.currentPage * 100 + 1
+        : 0
+    }}</span>
+    to <span class="paginationText">{{ gridPagination.toRecord }}</span> of
+    <span class="paginationText">{{ gridPagination.totalRecords }}</span>
+    <div style="display: flex; align-items: center">
+      <i
+        class="pi pi-fast-backward paginationIcon"
+        (click)="handlePagination('first')"
+      ></i>
+      <i
+        class="pi pi-caret-left paginationIcon"
+        (click)="handlePagination('previous')"
+      ></i>
+      Page
+      <span class="paginationText">{{ gridPagination.currentPage + 1 }}</span>
+      of {{ gridPagination.totalPages + 1 }}
+      <i
+        class="pi pi-caret-right paginationIcon"
+        (click)="handlePagination('next')"
+      ></i>
+      <i
+        class="pi pi-fast-forward paginationIcon"
+        (click)="handlePagination('last')"
+      ></i>
+    </div>
+  </div>
+</c-card>

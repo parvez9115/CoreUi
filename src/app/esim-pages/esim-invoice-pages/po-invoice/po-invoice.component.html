@@ -1,0 +1,488 @@
+<p-toast key="toast1"></p-toast>
+<button cButton class="floatingButton" title="Export" (click)="export()">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 2px"
+  ></i>
+</button>
+<!-- <div class="card" style="margin-bottom: 10px">
+  <p-tabMenu
+    #tabMenu
+    class="caTabs"
+    [scrollable]="true"
+    [model]="tabs"
+    [activeItem]="activeTab"
+    (activeItemChange)="tabChanged($event)"
+  ></p-tabMenu>
+</div> -->
+
+<!-- <c-row style="margin-bottom: 10px; justify-content: center">
+  <c-col
+    style="display: grid; padding-bottom: 5px"
+    xs="12"
+    md="3"
+    *ngIf="!isPendingTab"
+  >
+    <button
+      (mouseover)="pendinginvoicecount()"
+      (click)="gridchanges('Pending')"
+      cButton
+      class="custom-button"
+      #activateProduct
+      [ngClass]="{
+        selectedUpperCol: 'true',
+        selected: whichgrid == 'Pending'
+      }"
+    >
+      Pending Invoice
+      <span
+        *ngIf="color != 'red'"
+        style="
+          background-color: #28e070;
+          padding: 1px;
+          padding-left: 5px;
+          padding-right: 5px;
+          border-radius: 20px;
+          color: #000;
+          font-weight: bold;
+          font-size: 16px;
+        "
+        >{{ invoices }}</span
+      >
+      <span
+        *ngIf="color == 'red'"
+        style="
+          background-color: red;
+          padding: 1px;
+          padding-left: 5px;
+          padding-right: 5px;
+          border-radius: 20px;
+          color: #fff;
+          font-weight: bold;
+          font-size: 16px;
+        "
+        >{{ invoices }}</span
+      >
+    </button>
+  </c-col>
+  <c-col
+    style="display: grid; padding-bottom: 5px"
+    xs="12"
+    md="3"
+    *ngIf="!isPendingTab"
+  >
+    <button
+      (mouseover)="closeinvoicecount()"
+      (click)="gridchanges('Close')"
+      cButton
+      class="custom-button"
+      [ngClass]="{
+        selectedUpperCol: 'true',
+        selected: whichgrid == 'Close'
+      }"
+    >
+      Closed Invoice
+      <span
+        *ngIf="closecolor != 'red'"
+        style="
+          background-color: #28e070;
+          padding: 1px;
+          padding-left: 5px;
+          padding-right: 5px;
+          border-radius: 20px;
+          color: #000;
+          font-weight: bold;
+          font-size: 16px;
+        "
+        >{{ closeinvoices }}</span
+      >
+      <span
+        *ngIf="closecolor == 'red'"
+        style="
+          background-color: red;
+          padding: 1px;
+          padding-left: 5px;
+          padding-right: 5px;
+          border-radius: 20px;
+          color: #fff;
+          font-weight: bold;
+          font-size: 16px;
+        "
+        >{{ closeinvoices }}</span
+      >
+    </button>
+  </c-col>
+  <c-col
+    style="display: grid; padding-bottom: 5px"
+    xs="12"
+    md="3"
+    *ngIf="!isPendingTab"
+  >
+    <button
+      (mouseover)="deleteinvoicecount()"
+      (click)="gridchanges('Deleted')"
+      cButton
+      class="custom-button"
+      [ngClass]="{
+        selectedUpperCol: 'true',
+        selected: whichgrid == 'Deleted'
+      }"
+    >
+      Deleted Invoice
+      <span
+        *ngIf="deletecolor != 'red'"
+        style="
+          background-color: #28e070;
+          padding: 1px;
+          padding-left: 5px;
+          padding-right: 5px;
+          border-radius: 20px;
+          color: #000;
+          font-weight: bold;
+          font-size: 16px;
+        "
+        >{{ deleteinvoices }}</span
+      >
+      <span
+        *ngIf="deletecolor == 'red'"
+        style="
+          background-color: red;
+          padding: 1px;
+          padding-left: 5px;
+          padding-right: 5px;
+          border-radius: 20px;
+          color: #fff;
+          font-weight: bold;
+          font-size: 16px;
+        "
+        >{{ deleteinvoices }}</span
+      >
+    </button>
+  </c-col>
+</c-row> -->
+
+<c-card class="mb-4" *ngIf="activeTab.label == 'Pending'">
+  <ag-grid-angular
+    #myGrid
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowData]="gridData"
+    [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+    [columnDefs]="columnpending"
+    [defaultColDef]="defaultColDef"
+    (gridReady)="onGridReady($event)"
+    rowAnimation
+    enableCellTextSelection
+  >
+  </ag-grid-angular>
+</c-card>
+
+<c-card class="mb-4" *ngIf="activeTab.label == 'Invoice'">
+  <div style="display: flex; justify-content: flex-end">
+    <span class="p-input-icon-left" style="width: 40%; margin: 5px">
+      <i class="pi pi-search"></i>
+      <input
+        type="text"
+        pInputText
+        (change)="gridPagination.checkSearch($event)"
+        (keyup.enter)="handlePagination('first')"
+        [(ngModel)]="gridPagination.searchTerm"
+        style="width: 100%"
+        placeholder="Search grid"
+      />
+      <i
+        class="pi pi-times"
+        style="right: 4%;cursor: pointer;"
+        (click)="
+          gridPagination.searchTerm = '';
+          gridPagination.isSearched?handlePagination('first'):null;
+          gridPagination.isSearched=false;
+        "
+      ></i>
+    </span>
+    <button
+      style="margin: 5px"
+      type="submit"
+      class="btn btn-primary"
+      (click)="handlePagination('first')"
+      [disabled]="
+        gridPagination.searchTerm == undefined ||
+        gridPagination.searchTerm == ''
+      "
+    >
+      Search
+    </button>
+  </div>
+  <ag-grid-angular
+    #myGrid
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowData]="invoicetabgrid"
+    [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+    [columnDefs]="columninvoice"
+    [defaultColDef]="defaultColDef"
+    (gridReady)="onGridReady($event)"
+    rowAnimation
+    enableCellTextSelection
+  >
+  </ag-grid-angular>
+  <div class="paginationContainer">
+    <span class="paginationText">{{
+      gridPagination.totalRecords!=0? gridPagination.currentPage * 100 + 1:0
+    }}</span>
+    to <span class="paginationText">{{ gridPagination.toRecord }}</span> of
+    <span class="paginationText">{{ gridPagination.totalRecords }}</span>
+    <div style="display: flex; align-items: center">
+      <i
+        class="pi pi-fast-backward paginationIcon"
+        (click)="handlePagination('first')"
+      ></i>
+      <i
+        class="pi pi-caret-left paginationIcon"
+        (click)="handlePagination('previous')"
+      ></i>
+      Page
+      <span class="paginationText">{{ gridPagination.currentPage + 1 }}</span>
+      of {{ gridPagination.totalPages + 1 }}
+      <i
+        class="pi pi-caret-right paginationIcon"
+        (click)="handlePagination('next')"
+      ></i>
+      <i
+        class="pi pi-fast-forward paginationIcon"
+        (click)="handlePagination('last')"
+      ></i>
+    </div>
+  </div>
+</c-card>
+
+<!-- <c-modal
+  size="xl"
+  alignment="center"
+  *ngIf="ViewModalLoader"
+  [visible]="ViewModalToggle"
+  (visibleChange)="handleViewModalToggle($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>View Details</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <ag-grid-angular
+      #selectedRowsGrid
+      style="height: 300px; margin-top: 10px"
+      class="ag-theme-alpine"
+      [rowData]="viewdata"
+      [columnDefs]="viewgrid"
+    >
+    </ag-grid-angular>
+  </c-modal-body>
+</c-modal> -->
+
+<!-- <c-modal
+  size="xl"
+  alignment="center"
+  [visible]="generateInvoiceModalToggle"
+  (visibleChange)="handlegenerateInvoiceModalToggle($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Invoice Details</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <c-row>
+      <c-col xs="12" md="4">
+        <label
+          ><span class="dealer-label">Dealer :</span> {{ dealer }}</label
+        ></c-col
+      >
+      <c-col xs="12" md="4"
+        ><label
+          ><span class="dealer-label">Invoice Date :</span> {{ date }}</label
+        ></c-col
+      >
+    </c-row>
+
+    <ag-grid-angular
+      #selectedRowsGrid
+      style="height: 300px; margin-top: 10px"
+      class="ag-theme-alpine"
+      [rowData]="invoicedata"
+      [columnDefs]="invoicegrid"
+    >
+    </ag-grid-angular>
+
+    <c-modal-footer>
+      <button cButton color="primary" (click)="GenerateInvoice()">
+        Submit
+      </button>
+      <button cButton color="secondary" (click)="toggleGenearteInvoiceModal()">
+        Close
+      </button>
+    </c-modal-footer>
+  </c-modal-body>
+</c-modal>
+
+<c-modal [visible]="deleteConfirm" #verticallyCenteredModal alignment="center">
+  <c-modal-header>
+    <h5 cModalTitle>Confirm</h5>
+    <button (click)="toggledeleteConfirm()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>Are you sure you want to delete ?</c-modal-body>
+  <c-modal-footer>
+    <button (click)="toggledeleteConfirm()" cButton color="secondary">
+      Close
+    </button>
+    <button (click)="deleteinvoice()" cButton color="primary">Ok</button>
+  </c-modal-footer>
+</c-modal>
+
+<c-modal [visible]="restore" #verticallyCenteredModal alignment="center">
+  <c-modal-header>
+    <h5 cModalTitle>Confirm</h5>
+    <button (click)="togglerestoreConfirm()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>Are you sure you want to restore ?</c-modal-body>
+  <c-modal-footer>
+    <button (click)="togglerestoreConfirm()" cButton color="secondary">
+      Close
+    </button>
+    <button (click)="Restore()" cButton color="primary">Ok</button>
+  </c-modal-footer>
+</c-modal> -->
+
+<c-modal
+  [visible]="viewreceivedamountpopup"
+  (visibleChange)="handlereceivedamountpopup($event)"
+  #verticallyCenteredModal
+  alignment="center"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Received Amount</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <form [formGroup]="receivedform">
+      <c-row>
+        <c-input-group class="mb-3">
+          <span
+            style="width: 35%; font-weight: 550"
+            cInputGroupText
+            id="basic-addon1"
+            >Company Name</span
+          >
+          <input
+            class="dimmed-input"
+            aria-describedby="basic-addon1"
+            aria-label="Account No"
+            formControlName="companyname"
+            cFormControl
+          />
+        </c-input-group>
+      </c-row>
+      <c-row>
+        <c-input-group class="mb-3">
+          <span
+            style="width: 35%; font-weight: 550"
+            cInputGroupText
+            id="basic-addon1"
+            >Invoice No</span
+          >
+          <input
+            class="dimmed-input"
+            aria-describedby="basic-addon1"
+            aria-label="Account No"
+            formControlName="invoiceno"
+            cFormControl
+          />
+        </c-input-group>
+      </c-row>
+      <c-row>
+        <c-input-group class="mb-3">
+          <span
+            style="width: 35%; font-weight: 550"
+            cInputGroupText
+            id="basic-addon1"
+            >Invoice Date</span
+          >
+          <input
+            class="dimmed-input"
+            aria-describedby="basic-addon1"
+            aria-label="Account No"
+            formControlName="invoicedate"
+            cFormControl
+          />
+        </c-input-group>
+      </c-row>
+      <c-row>
+        <c-input-group class="mb-3">
+          <span
+            style="width: 35%; font-weight: 550"
+            cInputGroupText
+            id="basic-addon1"
+            >Total Amount</span
+          >
+          <input
+            class="dimmed-input"
+            aria-describedby="basic-addon1"
+            aria-label="Account No"
+            formControlName="totalamount"
+            cFormControl
+          />
+        </c-input-group>
+      </c-row>
+      <c-row>
+        <c-input-group class="mb-3">
+          <span
+            style="width: 35%; font-weight: 550"
+            cInputGroupText
+            id="basic-addon1"
+            >Received Date
+          </span>
+          <input
+            class="dimmed-input"
+            aria-describedby="basic-addon1"
+            formControlName="receiveddate"
+            aria-label="Account No"
+            cFormControl
+          />
+        </c-input-group>
+      </c-row>
+    </form>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton (click)="submit()" color="primary">Submit</button>
+    <button cButton (click)="togglereceivedamountModel()" color="secondary">
+      Close
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<c-modal
+*ngIf="viewinvoicedetailLoader"
+  [visible]="viewinvoicedetailtoggle"
+  (visibleChange)="handledetailpopup($event)"
+  #verticallyCenteredModal
+  alignment="center"
+  size="lg"
+>
+  <c-modal-header>
+    <h5 cModalTitle>View Details</h5>
+    <button (click)="toggleinvoiceModel()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <ag-grid-angular
+      #myGrid
+      style="height: 300px; margin-top: 10px"
+      class="ag-theme-alpine"
+      [rowData]="invoicedetails"
+      [columnDefs]="invoicedetailgrid"
+    >
+    </ag-grid-angular>
+  </c-modal-body>
+</c-modal>

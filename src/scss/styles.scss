@@ -1,0 +1,212 @@
+/* You can add global styles to this file, and also import other style files */
+// If you want to override variables do it here
+@import "variables";
+
+$enable-ltr: true;
+$enable-rtl: true;
+
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.css";
+
+// Import styles with default layout.
+@import "@coreui/coreui/scss/coreui";
+
+// Import Chart.js custom tooltips styles
+@import "@coreui/chartjs/scss/coreui-chartjs";
+
+// perfect scrollbar theming for use with [perfectScrollbar] directive
+//@import '~perfect-scrollbar/css/perfect-scrollbar.css';
+
+@import "layout";
+
+// Some temp fixes
+@import "fixes";
+
+// Prism.js
+@import "examples";
+
+// If you want to add something do it here
+@import "custom";
+@import "ag-grid-community/styles/ag-grid.css";
+@import "ag-grid-community/styles/ag-theme-alpine.css";
+@import "primeicons/primeicons.css";
+@import url("https://fonts.googleapis.com/css2?family=Rubik&family=Sora&display=swap");
+
+html,
+body {
+  height: 100%;
+  background-color: #ebedef;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.p-dropdown-label {
+  margin-top: -9px !important;
+}
+
+html:not([dir="rtl"]) .header-brand {
+  margin-right: 0rem;
+  padding: 0px;
+}
+
+a[href="https://primeng.org/lts"] {
+  display: none;
+}
+
+.floatingButton {
+  height: 50px;
+  width: 50px;
+  background-color: rgb(0, 187, 0);
+  border: 0px;
+  border-radius: 50px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.6);
+  z-index: 10;
+  position: fixed;
+  left: 93vw;
+  top: 80%;
+  transition: width 0.2s, height 0.2s, margin-top 0.2s, margin-left 0.2s;
+}
+
+.floatingButton:hover {
+  background-color: rgb(0, 204, 0);
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.6);
+  height: 60px;
+  width: 60px;
+  margin-top: -5px;
+  margin-left: -5px;
+  transition: width 0.2s, height 0.2s, margin-top 0.2s, margin-left 0.2s;
+}
+
+@media (max-width: 950px) {
+  .floatingButton {
+    left: 90vw;
+  }
+}
+
+@media (max-width: 675px) {
+  .floatingButton {
+    left: 85vw;
+  }
+}
+
+@media (max-width: 455px) {
+  .floatingButton {
+    left: 78vw;
+  }
+}
+
+.p-dropdown-trigger {
+  justify-content: flex-start !important;
+  width: max-content !important;
+  padding: 0px 5px !important;
+}
+
+.p-dropdown-label {
+  padding-right: 0px;
+}
+
+.p-checkbox .p-checkbox-box.p-highlight {
+  border-color: #00da00 !important;
+  background: #00da00 !important;
+}
+
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
+  border-color: #00da00 !important;
+}
+
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-focus {
+  border-color: #61ff18 !important;
+}
+
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
+  border-color: #00da00 !important;
+  background: #00da00 !important;
+}
+
+.p-button.p-button-icon-only.p-button-rounded {
+  border-radius: 50%;
+  height: 2rem !important;
+  width: 2rem !important;
+}
+
+.pcs-template-header {
+  display: none !important;
+}
+
+.pcs-template-footer {
+  display: none !important;
+}
+
+p-inputNumber .p-inputtext {
+  border: none;
+}
+
+c-header-brand.header-brand {
+  cursor: default;
+  font-family: "Sora", sans-serif;
+}
+
+.p-overlaypanel {
+  background-color: whitesmoke;
+  padding: 10px;
+}
+
+.p-overlaypanel .p-overlaypanel-content {
+  padding: 0;
+}
+
+.p-overlaypanel .p-overlaypanel-content ul {
+  margin: 0;
+}
+
+.caTabs .p-menuitem-link {
+  width: 150px;
+  justify-content: center;
+}
+
+p-inputnumber .p-inputtext {
+  width: 100%;
+}
+
+@media (min-width: 1200px) {
+
+  c-container .container-xl,
+  .container-lg,
+  .container-md,
+  .container-sm,
+  .container {
+    max-width: 100% !important;
+  }
+}
+
+// .ag-theme-alpine {
+//   --ag-grid-size: 5px;
+//   --ag-font-size: 12px;
+//   --ag-font-family: system-ui;
+// }
+
+.paginationContainer{
+  height:50px;
+  width:100%;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  font-size: 0.9em;
+  padding-right: 20px;
+}
+
+.paginationText{
+  font-weight: 500 !important;
+  color: #321fdb !important;
+  margin:5px;
+}
+
+.paginationIcon{
+  margin: 0px 4px;
+  font-size: 1.1em;
+  color:#8f8f8f;
+  cursor: pointer;
+}

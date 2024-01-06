@@ -1,0 +1,18 @@
+.chart-container {
+    position: relative;
+    height: 50vh;
+    width: 25vw;
+}
+
+.custom-button {
+    font-weight: 500;
+    background: linear-gradient(132deg, rgba(29, 78, 216, 0.89), #e74655);
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 34px;
+    border: none;
+    color: white;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+    cursor: pointer;
+}

@@ -1,0 +1,247 @@
+<p-toast key="toast1"></p-toast>
+<button cButton class="floatingButton" title="Export" (click)="export()">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 2px"
+  ></i>
+</button>
+<c-col
+  style="display: flex; justify-content: flex-end; margin: 10px"
+  *ngIf="pagePermissions?.view?.value == true"
+>
+  <button
+    (click)="toggleActivateModal()"
+    cButton
+    style="background-color: red; border-style: none"
+    class="custom-button"
+  >
+    Request for Commercial Activation
+  </button>
+</c-col>
+<c-card class="mb-4" *ngIf="pagePermissions?.view?.value == true">
+  <div style="display: flex; justify-content: flex-end">
+    <span class="p-input-icon-left" style="width: 40%; margin: 5px">
+      <i class="pi pi-search"></i>
+      <input
+        type="text"
+        pInputText
+        (change)="gridPagination.checkSearch($event)"
+        (keyup.enter)="handlePagination('first')"
+        [(ngModel)]="gridPagination.searchTerm"
+        style="width: 100%"
+        placeholder="Search grid"
+      />
+      <i
+        class="pi pi-times"
+        style="right: 4%;cursor: pointer;"
+        (click)="
+          gridPagination.searchTerm = '';
+          gridPagination.isSearched?handlePagination('first'):null;
+          gridPagination.isSearched=false;
+        "
+      ></i>
+    </span>
+    <button
+      style="margin: 5px"
+      type="submit"
+      class="btn btn-primary"
+      (click)="handlePagination('first')"
+      [disabled]="
+        gridPagination.searchTerm == undefined ||
+        gridPagination.searchTerm == ''
+      "
+    >
+      Search
+    </button>
+  </div>
+  <ag-grid-angular
+    #myGrid
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowSelection]="'multiple'"
+    [rowData]="rowData"
+    [gridOptions]="{
+    localeText: {
+      noRowsToShow: 'No Requests were found',
+      }
+    }"
+    [rowMultiSelectWithClick]="true"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    (gridReady)="onGridReady($event)"
+    rowAnimation
+    enableCellTextSelection
+  >
+  </ag-grid-angular>
+  <div class="paginationContainer">
+    <span class="paginationText">{{
+      gridPagination.totalRecords!=0? gridPagination.currentPage * 100 + 1:0
+    }}</span>
+    to <span class="paginationText">{{ gridPagination.toRecord }}</span> of
+    <span class="paginationText">{{ gridPagination.totalRecords }}</span>
+    <div style="display: flex; align-items: center">
+      <i
+        class="pi pi-fast-backward paginationIcon"
+        (click)="handlePagination('first')"
+      ></i>
+      <i
+        class="pi pi-caret-left paginationIcon"
+        (click)="handlePagination('previous')"
+      ></i>
+      Page
+      <span class="paginationText">{{ gridPagination.currentPage + 1 }}</span>
+      of {{ gridPagination.totalPages + 1 }}
+      <i
+        class="pi pi-caret-right paginationIcon"
+        (click)="handlePagination('next')"
+      ></i>
+      <i
+        class="pi pi-fast-forward paginationIcon"
+        (click)="handlePagination('last')"
+      ></i>
+    </div>
+  </div>
+</c-card>
+
+<div *ngIf="activateModalLoader">
+  <c-modal
+    id="activateModal"
+    #activateModal
+    alignment="center"
+    size="lg"
+    [visible]="activateModalToggle"
+    (visibleChange)="handleActivateModalChange($event)"
+  >
+    <c-modal-header>
+      <h5 cModalTitle>Select Plan for Commercial Activation</h5>
+    </c-modal-header>
+    <c-modal-body>
+      <ag-grid-angular
+        #selectedRowsGrid
+        style="height: 300px"
+        class="ag-theme-alpine"
+        [rowData]="selectedRows"
+        [columnDefs]="selectedRowColumnDefs"
+        [defaultColDef]="defaultColDef"
+      >
+      </ag-grid-angular>
+
+      <label
+        for="address"
+        style="margin-bottom: 5px; margin-top: 10px; font-weight: bold"
+        >Activation Plans :</label
+      >
+
+      <p-dropdown
+        autoWidth="false"
+        [style]="{ width: '100%' }"
+        [options]="plans"
+        optionValue="planValue"
+        optionLabel="years"
+        [(ngModel)]="plan"
+        [showClear]="true"
+        placeholder="Select a plan"
+      ></p-dropdown>
+    </c-modal-body>
+    <c-modal-footer>
+      <button
+        cButton
+        color="primary"
+        disabled="{{ plan == undefined || plan == '' }}"
+        (click)="requestForCA()"
+      >
+        Request for CA
+      </button>
+      <button (click)="toggleActivateModal()" cButton color="secondary">
+        Close
+      </button>
+    </c-modal-footer>
+  </c-modal>
+</div>
+
+<div *ngIf="generateInvoiceModalLoader">
+  <c-modal size="xl" alignment="center" [visible]="generateInvoiceModalToggle">
+    <c-modal-header>
+      <h5 cModalTitle>Invoice Details</h5>
+    </c-modal-header>
+    <c-modal-body>
+      <c-row>
+        <c-col xs="12" md="4">
+          <label
+            ><span class="dealer-label">Company :</span> {{ dealer }}</label
+          ></c-col
+        >
+        <c-col xs="12" md="4"
+          ><label
+            ><span class="dealer-label">Invoice Date :</span> {{ date }}</label
+          ></c-col
+        >
+      </c-row>
+
+      <c-row *ngIf="visible" style="margin-top: 10px">
+        <c-col xs="12" md="4">
+          <label
+            ><span class="dealer-label">Primary ICCID : </span
+            >{{ selectedimei }}</label
+          ></c-col
+        >
+        <c-col xs="12" md="5">
+          <p-dropdown
+            autoWidth="false"
+            [style]="{ width: '100%' }"
+            [options]="editfilter"
+            optionValue="productname"
+            optionLabel="productname"
+            [(ngModel)]="selctedproductname"
+            [showClear]="true"
+          ></p-dropdown>
+        </c-col>
+        <!-- <c-col>
+          <button cButton color="primary" (click)="save()">Save</button>
+          <button
+            style="margin-left: 3px"
+            cButton
+            color="secondary"
+            (click)="dismiss()"
+          >
+            Cancel
+          </button>
+        </c-col> -->
+      </c-row>
+
+      <ag-grid-angular
+        #selectedRowsGrid
+        style="height: 300px; margin-top: 10px"
+        class="ag-theme-alpine"
+        [rowData]="invoicedata"
+        [columnDefs]="invoicegrid"
+      >
+      </ag-grid-angular>
+
+      <c-modal-footer>
+        <button cButton color="primary" (click)="GenerateInvoice()">
+          Submit
+        </button>
+        <button
+          cButton
+          color="secondary"
+          (click)="toggleGenearteInvoiceModal()"
+        >
+          Close
+        </button>
+      </c-modal-footer>
+    </c-modal-body>
+  </c-modal>
+</div>
+
+<c-modal [visible]="endisConfirm" #verticallyCenteredModal alignment="center">
+  <c-modal-header>
+    <h5 cModalTitle>Confirm</h5>
+    <button (click)="toggleConfirm()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>Are you sure you want to delete ?</c-modal-body>
+  <c-modal-footer>
+    <button (click)="toggleConfirm()" cButton color="secondary">Close</button>
+    <button (click)="delete()" cButton color="primary">Ok</button>
+  </c-modal-footer>
+</c-modal>

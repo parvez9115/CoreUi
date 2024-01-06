@@ -1,0 +1,182 @@
+<button
+  *ngIf="rowData.length > 0"
+  cButton
+  class="floatingButton"
+  title="Export"
+  (click)="export()"
+>
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 1px"
+  ></i>
+</button>
+<p-toast key="toast1"></p-toast>
+<c-card *ngIf="pagePermission?.view?.value" class="mt-3 shadow">
+  <c-card-body>
+    <form [formGroup]="billingGereration">
+      <c-row class="align-items-start">
+        <c-col sm="6" style="margin-bottom: 5px">
+          <p-dropdown
+            autoWidth="false"
+            [style]="{ width: '100%' }"
+            [options]="provider"
+            optionValue="name"
+            optionLabel="name"
+            (onChange)="getPlan()"
+            [filter]="true"
+            filterBy="name"
+            formControlName="simprovider"
+            [showClear]="true"
+            placeholder="Select the sim provider "
+          >
+            <ng-template let-provider pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div>{{ provider.name }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+        </c-col>
+        <c-col sm="6">
+          <p-dropdown
+            autoWidth="false"
+            [style]="{ width: '100%' }"
+            [options]="plan"
+            optionValue="name"
+            optionLabel="name"
+            [filter]="true"
+            filterBy="name"
+            formControlName="accountno"
+            [showClear]="true"
+            placeholder="Select the account no "
+          >
+            <ng-template let-plan pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div>{{ plan.name }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+        </c-col>
+      </c-row>
+      <c-row style="margin: 20px 0px">
+        <c-col sm="6" *ngIf="billingGereration.controls['fromdate'] as ctrl">
+          <c-input-group sizing="sm">
+            <span cInputGroupText id="basic-addon1">From Date</span>
+            <input
+              aria-describedby="basic-addon1"
+              aria-label="Username"
+              (change)="dateValidation('from')"
+              formControlName="fromdate"
+              cFormControl
+              type="date"
+              [valid]="
+                ctrl.touched && ctrl.valid
+                  ? true
+                  : ctrl.touched && ctrl.invalid
+                  ? false
+                  : undefined
+              "
+            />
+          </c-input-group>
+          <c-form-feedback
+            *ngIf="ctrl.invalid"
+            style="display: block; font-size: 12px"
+          >
+            <ng-container *ngIf="ctrl.errors as errors">
+              <div *ngIf="errors['invalidDate']">
+                From date must be later than To date
+              </div>
+              <div *ngIf="errors['invalidYear']">Enter a valid year</div>
+            </ng-container>
+          </c-form-feedback>
+        </c-col>
+        <c-col sm="6" *ngIf="billingGereration.controls['todate'] as ctrl">
+          <c-input-group sizing="sm">
+            <span cInputGroupText id="basic-addon1">To Date</span>
+            <input
+              aria-describedby="basic-addon1"
+              aria-label="Username"
+              (change)="dateValidation('to')"
+              formControlName="todate"
+              cFormControl
+              type="date"
+              [valid]="
+                ctrl.touched && ctrl.valid
+                  ? true
+                  : ctrl.touched && ctrl.invalid
+                  ? false
+                  : undefined
+              "
+            />
+          </c-input-group>
+          <c-form-feedback
+            *ngIf="ctrl.invalid"
+            style="display: block; font-size: 12px"
+          >
+            <ng-container *ngIf="ctrl.errors as errors">
+              <div *ngIf="errors['invalidDate']">
+                To date must be later than From date
+              </div>
+              <div *ngIf="errors['invalidYear']">Enter a valid year</div>
+            </ng-container>
+          </c-form-feedback>
+        </c-col>
+      </c-row>
+    </form>
+    <div style="display: flex; justify-content: center">
+      <div>
+        <button
+          style="margin-right: 10px"
+          size="sm"
+          cButton
+          color="primary"
+          (click)="save()"
+          [disabled]="!billingGereration.valid"
+          variant="outline"
+        >
+          Submit
+        </button>
+      </div>
+      <div>
+        <button
+          size="sm"
+          style="margin-left: 10px"
+          cButton
+          (click)="clear()"
+          color="dark"
+          variant="outline"
+        >
+          Clear
+        </button>
+      </div>
+    </div>
+  </c-card-body>
+</c-card>
+
+<div [visible]="visible" cCollapse>
+  <c-card class="mb-4">
+    <ag-grid-angular
+      #myGrid
+      style="height: 100vh"
+      class="ag-theme-alpine"
+      [pagination]="true"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      rowAnimation
+      enableCellTextSelection
+      (firstDataRendered)="onFirstDataRendered($event)"
+      [paginationPageSize]="selectedRowSize"
+    >
+    </ag-grid-angular>
+    <div
+      class="card flex justify-content-center"
+      style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+    >
+      <p-dropdown
+        [(ngModel)]="selectedRowSize"
+        [style]="{ width: '100%', 'max-height': '35px' }"
+        [options]="[100, 200, 500, 1000]"
+      ></p-dropdown>
+    </div>
+  </c-card>
+</div>

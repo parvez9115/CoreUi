@@ -1,0 +1,95 @@
+.onoffswitch {
+  position: relative;
+  margin-top: 10px;
+  width: 115px;
+}
+
+.onoffswitch-checkbox {
+  display: none;
+}
+
+.onoffswitch-label {
+  display: block;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid whitesmoke;
+  border-radius: 22px;
+}
+
+.onoffswitch-inner {
+  display: block;
+  width: 200%;
+  margin-left: -100%;
+  transition: margin 0.2s ease-in 0s;
+}
+
+.onoffswitch-inner:before,
+.onoffswitch-inner:after {
+  display: block;
+  float: left;
+  width: 50%;
+  height: 22px;
+  padding: 0;
+  line-height: 22px;
+  font-size: 12px;
+  color: rgb(220, 220, 220);
+  box-sizing: border-box;
+}
+
+.onoffswitch-inner:before {
+  content: "ACTIVATED";
+  padding-left: 17px;
+  background-color: #2ab934;
+  color: rgb(255, 255, 255);
+}
+
+.onoffswitch-inner:after {
+  content: "DEACTIVATED";
+  padding-right: 7px;
+  background-color: #ca2222;
+  color: rgb(255, 255, 255);
+  text-align: right;
+}
+
+.onoffswitch-switch {
+  display: block;
+  width: 22px;
+  margin: 3px;
+  background: rgb(255, 255, 255);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 87px;
+  border: 1px solid rgb(158, 158, 158);
+  border-radius: 22px;
+  transition: all 0.2s ease-in 0s;
+}
+
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+  margin-left: 0;
+}
+
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+  right: 0px;
+}
+
+:host ::ng-deep .p-dropdown {
+  height: 5.5vh;
+}
+
+.custom-button {
+  font-weight: 500;
+  background: linear-gradient(132deg, rgba(29, 78, 216, 0.89), #e74655);
+  padding-left: 20px;
+  padding-right: 20px;
+  border: none;
+  color: white;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+  cursor: pointer;
+}
+
+.custom-button:hover {
+  background: linear-gradient(132deg, #194ee0f7, #d32b2b);
+  box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.3);
+}

@@ -1,0 +1,147 @@
+<button cButton class="floatingButton" (click)="export()" title="Export">
+  <i
+    class="pi pi-file-excel"
+    style="font-size: x-large; margin: 4px 0px 0px 1px"
+  ></i>
+</button>
+<div
+  *ngIf="isEdit == true || pagePermission.add.value == true"
+  [visible]="visible"
+  cCollapse
+>
+  <p-toast key="toast1"></p-toast>
+  <c-card class="mt-3 shadow">
+    <c-card-body>
+      <form [formGroup]="saveBillingPlan">
+        <c-row class="align-items-start">
+          <c-col sm="4" style="margin-bottom: 15px">
+            <p-dropdown
+              autoWidth="false"
+              [style]="{ width: '100%' }"
+              [options]="provider"
+              optionValue="name"
+              optionLabel="name"
+              [filter]="true"
+              filterBy="name"
+              formControlName="simprovider"
+              [showClear]="true"
+              placeholder="Select the sim provider "
+            >
+              <ng-template let-provider pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                  <div>{{ provider.name }}</div>
+                </div>
+              </ng-template>
+            </p-dropdown>
+          </c-col>
+          <c-col sm="4">
+            <c-input-group class="mb-3" sizing="sm">
+              <span cInputGroupText id="basic-addon1">Plan Name</span>
+              <input
+                aria-describedby="basic-addon1"
+                aria-label="Username"
+                formControlName="planname"
+                cFormControl
+                placeholder="Enter the plan name"
+              />
+            </c-input-group>
+          </c-col>
+          <c-col sm="4">
+            <c-input-group class="mb-3" sizing="sm">
+              <span cInputGroupText id="basic-addon1">Plan Amount</span>
+              <input
+                aria-describedby="basic-addon1"
+                aria-label="Username"
+                formControlName="planamount"
+                cFormControl
+                placeholder="Enter the plan amount"
+              />
+            </c-input-group>
+          </c-col>
+        </c-row>
+      </form>
+      <div style="display: flex; justify-content: center">
+        <div>
+          <button
+            style="margin-right: 10px"
+            size="sm"
+            cButton
+            color="primary"
+            (click)="isEdit ? save('edit') : save('save')"
+            [disabled]="!saveBillingPlan.valid"
+            variant="outline"
+          >
+            {{ isEdit ? "Edit" : "Submit" }}
+          </button>
+        </div>
+        <div>
+          <button
+            size="sm"
+            style="margin-left: 10px"
+            cButton
+            (click)="clear()"
+            color="dark"
+            variant="outline"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    </c-card-body>
+  </c-card>
+</div>
+<c-row style="justify-content: end; margin: 10px 0px">
+  <button
+    (click)="toggleCollapse()"
+    size="sm"
+    cButton
+    color="primary"
+    *ngIf="pagePermission.add.value"
+  >
+    <svg cIcon name="{{ visible ? 'cilArrowTop' : 'cilArrowBottom' }}"></svg>
+    {{ visible ? "Close" : "Open" }}
+  </button>
+</c-row>
+<c-card *ngIf="pagePermission.view.value == true" class="mb-4">
+  <ag-grid-angular
+    #myGrid
+    [pagination]="true"
+    style="height: 100vh"
+    class="ag-theme-alpine"
+    [rowData]="rowData"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    (gridReady)="onGridReady()"
+    rowAnimation
+    enableCellTextSelection
+    [paginationPageSize]="selectedRowSize"
+  >
+  </ag-grid-angular>
+  <div
+    class="card flex justify-content-center"
+    style="position: absolute; bottom: 0; margin: 0 0 6px 5px"
+  >
+    <p-dropdown
+      [(ngModel)]="selectedRowSize"
+      [style]="{ width: '100%', 'max-height': '35px' }"
+      [options]="[100, 200, 500, 1000]"
+    ></p-dropdown>
+  </div>
+</c-card>
+
+<c-modal
+  [visible]="endisConfirm"
+  #verticallyCenteredModal
+  alignment="center"
+  (visibleChange)="handleYear($event)"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Confirm</h5>
+    <button (click)="toggleConfirm()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>Are you sure you want to delete ?</c-modal-body>
+  <c-modal-footer>
+    <button (click)="toggleConfirm()" cButton color="secondary">Close</button>
+    <button (click)="delete()" cButton color="primary">Ok</button>
+  </c-modal-footer>
+</c-modal>
